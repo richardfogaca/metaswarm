@@ -229,6 +229,17 @@ The restricted Step 4 slice should not proceed without these concrete tests:
 6. deterministic workflow tests prove `await_external_observation` triggers the refresh activity before the workflow re-reads BEADS and decides whether it can continue
 7. scenario tests prove blocked and sleeping summaries remain operator-facing state while the workflow stays open
 
+## Step 5 Practical Test Matrix
+
+The restricted Step 5 slice should not proceed without these concrete tests:
+
+1. workflow-state contract accepts `run_late_stage_action` plus explicit late-stage observation targets and rejects malformed `actionKey`, unsupported action kinds, or malformed comment payloads
+2. activity tests prove late-stage action execution is idempotent by `actionKey` and writes a stable derived receipt without invoking the underlying adapter twice
+3. deterministic workflow tests prove `await_external_observation` with `observation.kind: "ci"` wakes only after `external_observation_changed`, refreshes CI observation, and then re-reads BEADS
+4. deterministic workflow tests prove `await_external_observation` with `observation.kind: "pr_shepherd"` wakes on `pr_shepherd_tick`, refreshes PR observation, and then re-reads BEADS
+5. deterministic workflow tests prove `run_late_stage_action` executes through the idempotent boundary, refreshes the relevant observation, and does not duplicate side effects when BEADS still returns the same action state on the next loop
+6. scenario tests prove a review-comment follow-up path can wait, wake, execute a follow-up comment action, reconcile, and complete while summaries remain derived read models
+
 ## Acceptance Standard
 
 The implementation is on track only if the operator can eventually trust this experience:

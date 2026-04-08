@@ -116,6 +116,8 @@ GitHub comments, CI changes, and review arrivals can wake the runtime, but they 
 
 In the restricted Step 4 slice, this means an external-observation wakeup must trigger refresh and then BEADS reconciliation. The external event alone is never sufficient to continue.
 
+In the restricted Step 5 slice, this also means periodic PR shepherd wakeups are just timers or signals that cause observation refresh and BEADS reconciliation. They do not authorize branch mutation, comment posting, or completion by themselves.
+
 ### Contract 6: One Stable Business Identifier
 
 Recommended identity model:
@@ -165,6 +167,8 @@ Operations such as:
 - worktree creation
 
 must be replay-safe.
+
+For the restricted Step 5 slice, replay safety may be supported by a derived runtime action receipt keyed by a durable `actionKey`, as long as that receipt never becomes workflow authority and the workflow still re-reads BEADS after every action.
 
 ### No silent reviewer coupling
 

@@ -91,6 +91,7 @@ Signals or updates should be used for:
 - credentials configured
 - PR review arrived
 - CI changed
+- PR shepherd tick
 - manual resume
 - manual pause or cancel
 
@@ -109,6 +110,8 @@ They should not themselves encode metaswarm workflow logic.
 For a one-off delayed start, the thinnest acceptable scheduler shape is one that converts schedule configuration into the same launch contract used by ad hoc runs and lets Temporal own the actual timer.
 
 For recurring starts, a dedicated scheduler-owned Temporal workflow is a reasonable v1 shape when it is the simplest way to keep cadence, catchup, and overlap decisions durable while still producing explicit per-occurrence launch records before the issue workflow begins.
+
+For the restricted Step 5 slice, late-stage side effects may be executed through a small idempotent action boundary that writes derived runtime receipts keyed by a durable `actionKey`. That receipt is an audit and replay guard only. It does not replace BEADS workflow truth.
 
 ## Why Not Child Workflows In v1
 

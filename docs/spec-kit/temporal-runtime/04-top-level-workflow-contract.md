@@ -163,6 +163,68 @@ Important limit:
 - it is not yet the full metaswarm policy engine encoded in BEADS
 - richer next-step derivation remains deferred to later workflow phases
 
+## Step 5 Restricted Profile
+
+Step 5 should extend the same authority model rather than invent a second late-stage runtime lane.
+
+The first honest Step 5 slice is not full PR shepherding automation.
+
+It is:
+
+- explicit late-stage wait targets for CI, review comments, and periodic PR shepherd wakeups
+- one idempotent late-stage action contract
+- action execution followed by observation refresh and BEADS reconciliation
+- replay-safe receipts that remain derived runtime audit, not workflow truth
+
+Restricted late-stage additions:
+
+```ts
+type Step5WorkflowState =
+  | Step4WorkflowState
+  | {
+      version: 1;
+      kind: "run_late_stage_action";
+      lateStageAction: LateStageAction;
+      observation?: ExternalObservationTarget;
+      blockers?: string[];
+      stepsAttempted?: string[];
+      acceptedChanges?: string[];
+      validationSummary?: ValidationSummary;
+      lastUpdatedAt: string;
+    };
+
+type ExternalObservationTarget = {
+  kind: "generic" | "ci" | "review_comments" | "pr_shepherd";
+};
+
+type LateStageAction = {
+  kind: "sync_pr" | "post_pr_comment";
+  actionKey: string;
+  commentBody?: string;
+};
+```
+
+Interpretation rules for the restricted profile:
+
+- `await_external_observation` may now include `observation.kind`
+- `observation.kind: "ci"` means the workflow is explicitly waiting for CI observation refresh and should surface CI-specific blockers
+- `observation.kind: "review_comments"` means the workflow is explicitly waiting for PR review or review-comment observation refresh
+- `observation.kind: "pr_shepherd"` means the workflow is waiting for a periodic PR shepherd wakeup before refreshing PR state and re-reading BEADS
+- `run_late_stage_action` means the workflow must execute exactly one idempotent late-stage activity using `lateStageAction.actionKey`, refresh the relevant observation, and then re-read BEADS before deciding what comes next
+
+Recommended runtime receipt location:
+
+```text
+.metaswarm/runtime/action-receipts/<action-key>.json
+```
+
+Important limit:
+
+- receipt files are derived runtime audit and idempotency support only
+- receipt files must not become workflow authority
+- BEADS still decides whether the workflow should keep waiting, run another action, or complete
+- the restricted profile supports only the two action kinds above and does not yet claim full PR shepherd automation
+
 ## Responsibilities
 
 The top-level workflow must:
@@ -230,6 +292,13 @@ Step 4 restricted signal rules:
 - after either signal, the workflow must re-read BEADS and only continue if authoritative state has changed
 - `external_observation_changed` may wake a workflow waiting on external state, but the workflow must run the refresh activity before re-reading BEADS and deciding what to do next
 - duplicate signals must be harmless
+
+Step 5 restricted signal rules:
+
+- `external_observation_changed` may wake `await_external_observation` states whose `observation.kind` is `generic`, `ci`, or `review_comments`
+- `pr_shepherd_tick` may wake `await_external_observation` states whose `observation.kind` is `pr_shepherd`
+- after either wakeup, the workflow must refresh the relevant observation first and only then re-read BEADS
+- signals still do not authorize action execution or workflow completion by themselves
 
 ## Invariants
 

@@ -48,7 +48,7 @@ function makeRecurringScheduleDefinition(overrides = {}) {
 test('launchRecurringSchedule drives recurring existing-target runs through the issue workflow contract', async () => {
   const env = await TestWorkflowEnvironment.createTimeSkipping();
   const repoRoot = makeRepoRoot();
-  const initiatedAt = new Date(await env.currentTimeMs()).toISOString();
+  const initiatedAt = new Date((await env.currentTimeMs()) + 15 * 1000).toISOString();
 
   writeJson(
     repoRoot,
@@ -86,7 +86,7 @@ test('launchRecurringSchedule drives recurring existing-target runs through the 
       client: env.client,
     });
 
-    await env.sleep('70 seconds');
+    await env.sleep('80 seconds');
     await handle.cancel();
     await env.sleep('1 second');
     worker.shutdown();

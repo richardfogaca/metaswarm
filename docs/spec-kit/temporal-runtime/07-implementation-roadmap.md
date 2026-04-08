@@ -259,6 +259,33 @@ Phase exit gate:
 
 - do not proceed until late-stage side effects are replay-safe and next-day summaries clearly explain the result
 
+Step 5 restricted profile:
+
+- extend the Step 4 authority model instead of replacing it
+- support `await_external_observation` with explicit `observation.kind` values:
+  - `ci`
+  - `review_comments`
+  - `pr_shepherd`
+- support one action state, `run_late_stage_action`, with only two action kinds:
+  - `sync_pr`
+  - `post_pr_comment`
+- require every late-stage action to carry a durable `actionKey`
+- execute the action through an idempotent activity boundary, record a derived runtime receipt, refresh the relevant observation, and then re-read BEADS
+- treat `pr_shepherd_tick` as a wakeup only, never as workflow truth
+
+This slice is intentionally narrower than the eventual end state.
+
+It proves the second hard safety property:
+
+- late-stage external side effects can be replay-safe without moving workflow authority out of BEADS
+
+Explicitly defer after the restricted Step 5 slice:
+
+- full PR shepherd automation and branch mutation policy
+- review-resolution semantics beyond comment follow-up
+- CI-specific retry policy beyond wake, refresh, and reconcile
+- GitHub-specific adapter integration beyond the generic idempotent action boundary
+
 ### Step 6: Spec-To-Plan Lane
 
 Build:

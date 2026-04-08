@@ -81,7 +81,7 @@ test('recurring scheduler workflow survives worker restart and can be resumed by
   const scheduleDefinition = makeScheduleDefinition();
   const workflowId = toScheduleWorkflowId(scheduleDefinition.scheduleId);
   const startMs = await env.currentTimeMs();
-  const registeredAt = toIso(startMs);
+  const registeredAt = toIso(startMs + 15 * 1000);
 
   const workerOne = await Worker.create({
     connection: env.nativeConnection,
@@ -104,7 +104,7 @@ test('recurring scheduler workflow survives worker restart and can be resumed by
       workflowId,
     });
 
-    await env.sleep('70 seconds');
+    await env.sleep('80 seconds');
     workerOne.shutdown();
     await runWorkerOne;
 

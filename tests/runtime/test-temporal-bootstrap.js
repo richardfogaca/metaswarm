@@ -34,6 +34,10 @@ test('resolveRuntimePaths keeps runtime data under .metaswarm/runtime', () => {
   assert.equal(paths.launchesDir, path.join(repoRoot, '.metaswarm', 'runtime', 'launches'));
   assert.equal(paths.schedulesDir, path.join(repoRoot, '.metaswarm', 'runtime', 'schedules'));
   assert.equal(paths.reviewsDir, path.join(repoRoot, '.metaswarm', 'runtime', 'reviews'));
+  assert.equal(
+    paths.actionReceiptsDir,
+    path.join(repoRoot, '.metaswarm', 'runtime', 'action-receipts')
+  );
 });
 
 test('ensureRuntimeDirectories creates the bootstrap directory layout', () => {
@@ -45,6 +49,7 @@ test('ensureRuntimeDirectories creates the bootstrap directory layout', () => {
   assert.ok(fs.statSync(paths.launchesDir).isDirectory());
   assert.ok(fs.statSync(paths.schedulesDir).isDirectory());
   assert.ok(fs.statSync(paths.reviewsDir).isDirectory());
+  assert.ok(fs.statSync(paths.actionReceiptsDir).isDirectory());
 });
 
 test('toIssueWorkflowId uses the documented issue-<beads-id> shape', () => {
