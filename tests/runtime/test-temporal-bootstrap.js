@@ -28,6 +28,7 @@ test('resolveRuntimePaths keeps runtime data under .metaswarm/runtime', () => {
   assert.equal(paths.repoRoot, repoRoot);
   assert.equal(paths.runtimeRoot, path.join(repoRoot, '.metaswarm', 'runtime'));
   assert.equal(paths.taskDefinitionsDir, path.join(repoRoot, '.metaswarm', 'runtime', 'task-definitions'));
+  assert.equal(paths.launchesDir, path.join(repoRoot, '.metaswarm', 'runtime', 'launches'));
   assert.equal(paths.schedulesDir, path.join(repoRoot, '.metaswarm', 'runtime', 'schedules'));
   assert.equal(paths.reviewsDir, path.join(repoRoot, '.metaswarm', 'runtime', 'reviews'));
 });
@@ -38,6 +39,7 @@ test('ensureRuntimeDirectories creates the bootstrap directory layout', () => {
 
   assert.ok(fs.statSync(paths.runtimeRoot).isDirectory());
   assert.ok(fs.statSync(paths.taskDefinitionsDir).isDirectory());
+  assert.ok(fs.statSync(paths.launchesDir).isDirectory());
   assert.ok(fs.statSync(paths.schedulesDir).isDirectory());
   assert.ok(fs.statSync(paths.reviewsDir).isDirectory());
 });

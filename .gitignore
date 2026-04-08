@@ -10,6 +10,7 @@
 .beads/plans/
 
 # Temporal runtime derived artifacts
+.metaswarm/runtime/launches/
 .metaswarm/runtime/reviews/
 
 # Secrets

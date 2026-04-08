@@ -24,9 +24,9 @@ without replacing:
 The target system has five layers:
 
 1. task definition layer
-2. scheduler layer
-3. top-level issue workflow layer
-4. subtask/work-unit execution layer
+2. launch/materialization layer
+3. scheduler layer
+4. top-level issue workflow layer
 5. morning review/read-model layer
 
 ## Component Roles
@@ -88,11 +88,26 @@ Owns:
 
 - what should be launched
 - whether it is ad hoc, delayed-once, or recurring
-- how a run materializes or targets a BEADS task
+- how a run should target or materialize a BEADS task
 
 Does not own:
 
 - workflow semantics after launch
+
+### Launch / Materialization Layer
+
+Owns:
+
+- loading and validating task definitions for a concrete launch request
+- resolving an existing BEADS target or creating a new one before workflow start
+- producing a launch record that explains how the run mapped to a concrete BEADS id
+- starting the top-level workflow with one concrete BEADS target
+
+Does not own:
+
+- workflow semantics after launch
+- recurring cadence management
+- BEADS workflow truth after launch
 
 ### Scheduler Layer
 
@@ -129,19 +144,22 @@ Does not own:
 
 The scheduler starts top-level workflows.
 
-Top-level workflows apply metaswarm policy against BEADS truth.
+The launch/materialization layer resolves a concrete BEADS target first.
+
+Top-level workflows then apply metaswarm policy against BEADS truth.
 
 They do not invent their own workflow semantics.
 
 ## High-Level Sequence
 
 1. operator or schedule triggers a task definition
-2. scheduler starts a top-level workflow
-3. workflow resolves or materializes the target BEADS issue/epic
-4. workflow reads BEADS and determines the next legal metaswarm step
-5. workflow executes activities
-6. workflow waits when blocked
-7. workflow produces a morning review artifact
+2. the launch/materialization layer resolves or creates one concrete BEADS issue/epic
+3. the launch/materialization layer writes a launch record for the run
+4. scheduler or launcher starts a top-level workflow for that concrete BEADS target
+5. workflow reads BEADS and determines the next legal metaswarm step
+6. workflow executes activities
+7. workflow waits when blocked
+8. workflow produces a morning review artifact
 
 ## Primary Invariants
 

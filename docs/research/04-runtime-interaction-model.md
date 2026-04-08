@@ -6,14 +6,15 @@ Date: 2026-04-08
 
 The desired runtime pattern is:
 
-1. a Temporal workflow starts for one BEADS issue or epic
-2. it reads authoritative workflow state
-3. it determines the next eligible metaswarm step
-4. it executes that step through an activity
-5. it validates the result
-6. it writes accepted state back to authoritative workflow storage
-7. if blocked on a human or an external condition, it waits
-8. on wakeup, it re-reads authoritative state before continuing
+1. a launcher resolves or materializes one concrete BEADS issue or epic for the run
+2. a Temporal workflow starts for that concrete BEADS target
+3. it reads authoritative workflow state
+4. it determines the next eligible metaswarm step
+5. it executes that step through an activity
+6. it validates the result
+7. it writes accepted state back to authoritative workflow storage
+8. if blocked on a human or an external condition, it waits
+9. on wakeup, it re-reads authoritative state before continuing
 
 This loop assumes a higher-level structure around it:
 
@@ -40,6 +41,8 @@ The runtime should support three ways to enter the loop:
 
 In all three cases, the runtime behavior after start should converge on the same top-level workflow model.
 
+The launch path may differ, but the workflow should still begin with one explicit BEADS target rather than a deferred materialization instruction.
+
 ## Recommended v1 Shape
 
 ### One workflow per issue
@@ -55,6 +58,8 @@ This should remain the default model even when the system later supports subtask
 The scheduler starts a top-level workflow.
 
 The top-level workflow remains the owner of the issue lifecycle.
+
+The launch/materialization layer should finish resolving a concrete BEADS target first and record how that happened.
 
 ### Activities for side effects
 

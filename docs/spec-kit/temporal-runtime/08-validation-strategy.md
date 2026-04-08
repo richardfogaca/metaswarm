@@ -63,6 +63,7 @@ Purpose:
 Examples:
 
 - BEADS reads and writes
+- launch/materialization records
 - worktree operations
 - GitHub and CI observation normalization
 - summary materialization
@@ -94,6 +95,7 @@ Each contract should reject:
 - malformed timestamps
 - invalid overlap/catchup combinations
 - inconsistent materialization shapes
+- create-new materialization shapes that cannot be mapped to `bd create`
 
 ### Replay And Idempotency Tests
 
@@ -104,6 +106,7 @@ Examples:
 - creating a PR twice does not create duplicates
 - posting the same status comment twice does not spam
 - re-running materialization does not silently create conflicting BEADS tasks
+- re-running launch-record materialization for the same run id does not hide what concrete BEADS target was selected
 
 ### Wakeup And Resume Tests
 
@@ -179,6 +182,17 @@ The following assertions should be re-validated repeatedly:
 4. one top-level workflow still owns one issue or epic by default.
 5. subtasks remain inside the parent workflow unless explicitly promoted.
 6. morning review artifacts remain derived read models only.
+
+## Step 2 Practical Test Matrix
+
+Step 2 should not proceed without these concrete tests:
+
+1. task-definition contract accepts valid ad hoc existing-target and create-new definitions
+2. task-definition contract rejects create-new definitions missing BEADS creation inputs such as `issueType` or with invalid priority values
+3. task-definition loader rejects file/id mismatches and malformed JSON
+4. ad hoc launch tests prove existing-target and create-new paths both normalize to `IssueWorkflowInput` with one concrete `beadsTarget.kind: "existing"`
+5. launch-record tests prove every ad hoc run writes an explicit record containing the resolved BEADS id and the normalized workflow input
+6. scenario test proves an ad hoc launch can feed the Step 1 workflow and complete using the same runtime contract regardless of whether the BEADS target already existed or was created during launch
 
 ## Acceptance Standard
 

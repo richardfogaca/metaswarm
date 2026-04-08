@@ -65,21 +65,39 @@ Build:
 - task definition loader and validator
 - ad hoc task entry
 - existing-BEADS and create-new materialization paths
+- launch-record emission for each ad hoc run
 
 Must prove:
 
 - ad hoc tasks can launch safely
 - materialization into BEADS is explicit and reproducible
+- existing-target and create-new launches converge on the same concrete workflow input shape
+
+Step 2 restricted profile:
+
+- repo-local JSON task definitions
+- ad hoc launch only
+- materialization completes before workflow start
+- every workflow still starts with one concrete BEADS target
+- launch records are written to `.metaswarm/runtime/launches/<run-id>.json`
+
+Explicitly defer to later steps:
+
+- schedule-triggered execution of non-`ad_hoc` task definitions
+- recurring/catchup policy behavior
+- workflow-side BEADS reconciliation logic beyond the Step 1 skeleton
+- advanced template rendering beyond a minimal documented token set
 
 Validation strategy:
 
 - schema validation tests for task definition parsing and rejection
 - materialization tests for existing-BEADS and create-new paths
-- scenario tests proving that ad hoc launch and materialized launch converge on the same workflow input contract
+- launch-record tests proving the resolved BEADS target and materialization request are explicit
+- scenario tests proving that ad hoc existing-target launch and ad hoc create-new launch converge on the same workflow input contract
 
 Phase exit gate:
 
-- do not proceed until task definitions can be validated and mapped to explicit BEADS targets without hidden assumptions
+- do not proceed until task definitions can be validated, materialized into explicit BEADS targets without hidden assumptions, and launched through the same normalized workflow input contract
 
 ### Step 3: Schedule Definitions
 

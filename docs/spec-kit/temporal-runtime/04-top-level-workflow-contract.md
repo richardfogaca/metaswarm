@@ -28,16 +28,10 @@ type IssueWorkflowInput = {
   runtimeSkeleton?: Step1RuntimeSkeletonDirective;
 };
 
-type BeadsTarget =
-  | {
-      kind: "existing";
-      beadsId: string;
-    }
-  | {
-      kind: "materialized";
-      beadsId: string;
-      sourceTaskDefinitionId: string;
-    };
+type BeadsTarget = {
+  kind: "existing";
+  beadsId: string;
+};
 
 type Step1RuntimeSkeletonDirective = {
   mode: "complete" | "sleep_until";
@@ -53,6 +47,12 @@ Step 1 input rules:
 - `runtimeSkeleton.mode: "sleep_until"` requires `sleepUntil`
 - `sleepUntil` must be a valid timestamp later than `initiatedAt`
 - `reason` is optional operator-facing context for the emitted review artifact
+
+Step 2 launch rule:
+
+- launch/materialization must finish before workflow start
+- the workflow receives one concrete `beadsTarget`
+- ad hoc launches that create a new BEADS issue still normalize to `beadsTarget.kind: "existing"` before Temporal execution begins
 
 ## Output Contract
 
@@ -87,7 +87,6 @@ Supported in Step 1:
 
 Deferred until later steps:
 
-- `beadsTarget.kind: "materialized"`
 - BEADS-driven next-step derivation
 - human approval signals
 - external observation refresh
@@ -99,7 +98,7 @@ The `runtimeSkeleton` field exists only so Step 1 can prove runtime behavior wit
 
 The top-level workflow must:
 
-1. resolve or materialize the BEADS target
+1. accept one concrete BEADS target for the run
 2. read authoritative workflow state
 3. determine the next legal metaswarm step
 4. execute the step through activities
@@ -113,8 +112,7 @@ In Step 1, responsibilities 2 through 6 are intentionally reduced to contract va
 ## Core Loop
 
 ```text
-resolve target
-  -> read BEADS
+read BEADS
   -> derive next metaswarm step
   -> run activity
   -> validate
@@ -195,3 +193,5 @@ Examples:
 - `issue-bd-9001`
 
 For recurring launches, multiple runs may share the same schedule id but each workflow execution still maps to one concrete BEADS business target.
+
+That concrete target should already have been resolved or created by the launch/materialization layer before the workflow starts.
