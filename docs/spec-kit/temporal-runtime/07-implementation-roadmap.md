@@ -143,6 +143,49 @@ Phase exit gate:
 
 - do not proceed until delayed once schedules are deterministic, replay-safe, and clearly separate from BEADS workflow truth, with a documented path for later recurring expansion
 
+### Step 3 Expansion: Recurring Scheduler Slice
+
+Build:
+
+- recurring cadence support
+- one scheduler-owned workflow per `scheduleId`
+- overlap behavior for `skip` and `allow_parallel`
+- catchup behavior for `none` and `within_window`
+- schedule-triggered create-new materialization through the existing launch path
+
+Must prove:
+
+- recurring schedules launch durably on cadence
+- each due occurrence converges on the same launch-record and workflow-input model used elsewhere
+- overlap behavior is explicit instead of accidental
+- catchup behavior is explicit instead of accidental
+- timezone-aware recurring interpretation is stable for the supported cadence forms
+
+Restricted profile for this expansion:
+
+- cadence kinds `daily`, `weekly`, `monthly`, and `cron`
+- `overlapPolicy: "skip" | "allow_parallel"`
+- `catchupPolicy: "none" | "within_window"`
+- recurring cadence is owned by a dedicated scheduler workflow rather than repo-local ledgers
+- one-off delayed schedules remain on the existing Step 3 path
+
+Explicitly defer after this expansion:
+
+- overlap behavior richer than `skip` and `allow_parallel`
+- scheduler pause/resume/backfill/cancel lifecycle beyond validation and basic state checks
+- server-native Temporal Schedule migration
+
+Validation strategy:
+
+- contract tests for recurring schedule definitions, timezone handling requirements, and rejection of unsupported overlap/catchup values
+- deterministic workflow tests for recurring cadence, overlap decisions, and catchup windows under fake time
+- activity tests for recurring launch normalization, create-new materialization, and workflow-status inspection used for overlap checks
+- scenario tests proving recurring existing-target and recurring create-new launches both feed the same issue-workflow contract
+
+Phase exit gate:
+
+- do not proceed until recurring schedules can survive restart, launch explicit per-occurrence runs, enforce documented overlap/catchup behavior, and keep schedule execution truth inside Temporal
+
 ### Step 4: Top-Level Workflow Behavior
 
 Build:

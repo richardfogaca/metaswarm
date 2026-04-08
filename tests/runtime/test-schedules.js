@@ -96,24 +96,6 @@ test('validateScheduleDefinition rejects malformed and unsupported restricted-pr
       ),
     /catchupPolicy/i
   );
-
-  assert.throws(
-    () =>
-      validateScheduleDefinition(
-        makeScheduleDefinition({
-          trigger: {
-            kind: 'recurring',
-            cadence: {
-              kind: 'weekly',
-              dayOfWeek: 'MONDAY',
-              hour: 9,
-              minute: 0,
-            },
-          },
-        })
-      ),
-    /trigger/i
-  );
 });
 
 test('loadScheduleDefinition rejects malformed JSON and file/id mismatches', () => {

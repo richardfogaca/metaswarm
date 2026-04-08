@@ -116,12 +116,19 @@ Owns:
 - when to start a workflow
 - when to wake a workflow for time-based reasons
 - recurring cadence management
+- recurring overlap and catchup decisions
 - translating schedule definitions into the same normalized launch model used by ad hoc runs
 
 Does not own:
 
 - workflow phase logic
 - BEADS workflow truth
+
+Implementation note for Step 3 expansion:
+
+- delayed-once schedules may remain a thin launcher concern that uses Temporal delayed start
+- recurring schedules may use a dedicated scheduler-owned Temporal workflow per `scheduleId`
+- that scheduler workflow is a control-plane exception, not a business workflow replacement
 
 ### Top-Level Issue Workflow
 
@@ -144,9 +151,11 @@ Does not own:
 
 ## Primary Runtime Rule
 
-The scheduler starts top-level workflows.
+The scheduler controls time, not workflow law.
 
-The launch/materialization layer resolves a concrete BEADS target first.
+For ad hoc and delayed-once entry, the launcher resolves a concrete BEADS target first and then starts the top-level issue workflow.
+
+For recurring entry, a scheduler-owned workflow may hold cadence state and trigger concrete launches over time, but each concrete occurrence must still flow through launch/materialization before the top-level issue workflow starts.
 
 Top-level workflows then apply metaswarm policy against BEADS truth.
 
@@ -157,7 +166,7 @@ They do not invent their own workflow semantics.
 1. operator or schedule triggers a task definition
 2. the launch/materialization layer resolves or creates one concrete BEADS issue/epic
 3. the launch/materialization layer writes a launch record for the run
-4. the scheduler or launcher starts a top-level workflow for that concrete BEADS target using Temporal-native runtime controls such as delayed start
+4. the scheduler or launcher starts a top-level workflow for that concrete BEADS target using Temporal-native runtime controls such as delayed start or a scheduler-owned recurring workflow
 5. workflow reads BEADS and determines the next legal metaswarm step
 6. workflow executes activities
 7. workflow waits when blocked
@@ -168,6 +177,8 @@ They do not invent their own workflow semantics.
 1. BEADS remains workflow authority.
 2. Temporal remains runtime authority.
 3. Scheduling metadata remains separate from workflow truth.
-4. One top-level workflow owns one issue/epic by default.
+4. One top-level issue workflow owns one issue/epic by default.
 5. Subtasks remain inside the parent workflow by default.
 6. Morning review artifacts are read models only.
+
+Scheduler-owned workflows are allowed only as a narrow control-plane exception for recurring cadence management. They do not replace the top-level issue workflow as the business execution unit.

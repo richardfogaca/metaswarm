@@ -15,6 +15,8 @@ const {
   ensureRuntimeDirectories,
   resolveRuntimePaths,
   toIssueWorkflowId,
+  toRecurringWorkflowId,
+  toScheduleWorkflowId,
   toScheduledWorkflowId,
 } = require(path.join(ROOT, 'lib/runtime/temporal/bootstrap'));
 
@@ -59,6 +61,14 @@ test('toScheduledWorkflowId uses a schedule-scoped workflow id shape', () => {
   assert.throws(() => toScheduledWorkflowId('bd-1234', ''), /scheduleId/i);
 });
 
+test('recurring workflow id helpers use the documented recurring shapes', () => {
+  assert.equal(
+    toRecurringWorkflowId('bd-1234', 'sched-nightly', 'run-abc'),
+    'issue-bd-1234-schedule-sched-nightly-run-run-abc'
+  );
+  assert.equal(toScheduleWorkflowId('sched-nightly'), 'schedule-sched-nightly');
+});
+
 test('createWorkerBootstrapOptions wires task queue, workflow module, and activities', () => {
   const activities = {
     emitRunSummary() {},
@@ -71,7 +81,7 @@ test('createWorkerBootstrapOptions wires task queue, workflow module, and activi
 
   assert.equal(options.taskQueue, DEFAULT_TEMPORAL_TASK_QUEUE);
   assert.equal(options.activities, activities);
-  assert.match(options.workflowsPath, /lib\/runtime\/temporal\/workflows\/issue-workflow\.js$/);
+  assert.match(options.workflowsPath, /lib\/runtime\/temporal\/workflows\/index\.js$/);
 });
 
 test('temporal worker bootstrap script supports a dry-run check mode', () => {
@@ -90,6 +100,6 @@ test('temporal worker bootstrap script supports a dry-run check mode', () => {
 
   assert.equal(summary.taskQueue, DEFAULT_TEMPORAL_TASK_QUEUE);
   assert.equal(summary.repoRoot, repoRoot);
-  assert.match(summary.workflowsPath, /lib\/runtime\/temporal\/workflows\/issue-workflow\.js$/);
+  assert.match(summary.workflowsPath, /lib\/runtime\/temporal\/workflows\/index\.js$/);
   assert.equal(summary.runtimePaths.reviewsDir, path.join(repoRoot, '.metaswarm', 'runtime', 'reviews'));
 });

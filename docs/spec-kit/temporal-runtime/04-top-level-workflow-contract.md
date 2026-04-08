@@ -59,6 +59,7 @@ Step 3 schedule rule:
 - scheduled launches still normalize to the same `IssueWorkflowInput` shape
 - `scheduleId` is present for schedule-triggered runs
 - Temporal delay or scheduling metadata stays outside BEADS workflow truth
+- recurring cadence ownership may live in a separate scheduler workflow, but the issue workflow still starts only after one concrete launch has been materialized
 
 ## Output Contract
 
@@ -203,3 +204,13 @@ For recurring launches, multiple runs may share the same schedule id but each wo
 That concrete target should already have been resolved or created by the launch/materialization layer before the workflow starts.
 
 For delayed-once schedules, a schedule-scoped workflow id may be appropriate if that is the simplest way to keep schedule registration idempotent without weakening the business-id linkage to the BEADS target.
+
+For recurring schedules, a schedule-scoped issue-workflow id is not sufficient because multiple occurrences may legitimately start over time, including overlapping runs when policy allows it.
+
+Recommended recurring issue-workflow id shape:
+
+```text
+issue-<beads-id>-schedule-<schedule-id>-run-<run-id>
+```
+
+The scheduler workflow itself may use a stable control-plane id such as `schedule-<schedule-id>`. That scheduler-owned workflow is not a substitute for the top-level issue workflow. It only owns cadence and launch timing.

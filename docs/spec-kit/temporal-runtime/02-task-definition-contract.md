@@ -82,12 +82,14 @@ type LaunchRecord = {
       labels?: string[];
       priority?: 0 | 1 | 2 | 3 | 4;
       parentBeadsId?: string;
+      externalRef?: string;
     };
   };
   runtimeStart?: {
-    mode: "immediate" | "delayed_once";
+    mode: "immediate" | "delayed_once" | "recurring";
     startDelayMs?: number;
     scheduledFor?: string;
+    occurrenceKey?: string;
   };
   workflowInput: IssueWorkflowInput;
 };
@@ -154,7 +156,13 @@ Supported Step 2 render tokens for `titleTemplate`:
 
 The same tokens may be used inside `descriptionTemplateRef` contents when a description template is rendered.
 
-For Step 2, date tokens are derived from `initiatedAt` in UTC so ad hoc rendering remains deterministic across machines. Schedule-aware local-time rendering is deferred to the schedule phase.
+For Step 2, date tokens are derived from `initiatedAt` in UTC so ad hoc rendering remains deterministic across machines.
+
+Starting in the recurring schedule expansion, schedule-triggered launches should render date tokens from the concrete occurrence time for that launch:
+
+- use `scheduledFor` as the time basis
+- use the schedule definition `timezone` when local-time interpretation is required
+- keep the rendered create request explicit in the launch record so replay and auditing remain clear
 
 ### Step 2 Restricted Profile
 
@@ -207,6 +215,13 @@ Starting in Step 3, the same launch-record shape is also used for schedule-trigg
 - `scheduleId` identifies the schedule definition that triggered the run
 - `initiatedBy` is `schedule`
 - `runtimeStart` may describe delayed-start intent such as `scheduledFor` and `startDelayMs`
+
+For recurring launches:
+
+- `runtimeStart.mode` should be `recurring`
+- `runtimeStart.scheduledFor` should record the concrete cadence occurrence time
+- `runtimeStart.occurrenceKey` should provide a deterministic schedule-local occurrence identifier
+- create-new materialization may also record a deterministic `externalRef` so launch retries can recover the already-created BEADS issue instead of creating duplicates
 
 ## Invariants
 

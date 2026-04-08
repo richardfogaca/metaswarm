@@ -52,6 +52,8 @@ type ScheduledLaunchRequest = {
   triggerType: "scheduled_once" | "recurring";
   initiatedAt: string;
   initiatedBy: "schedule";
+  scheduledFor: string;
+  occurrenceKey: string;
   runtimeSkeleton?: {
     mode: "complete" | "sleep_until";
     sleepUntil?: string;
@@ -145,6 +147,46 @@ For delayed-once registration in Step 3:
 
 For one-off delayed schedules, the scheduler may use Temporal `startDelay` or an equivalent Temporal-native scheduling primitive so that timer state remains runtime truth inside Temporal rather than in repo-local files.
 
+## Step 3 Recurring Expansion Profile
+
+The first recurring slice should stay simple, explicit, and testable.
+
+Supported in the recurring expansion profile:
+
+- `trigger.kind: "recurring"`
+- cadence kinds `daily`, `weekly`, `monthly`, and `cron`
+- `overlapPolicy: "skip" | "allow_parallel"`
+- `catchupPolicy: "none" | "within_window"`
+- timezone-aware recurring interpretation through `timezone`
+- schedule-triggered launches for both existing-target and create-new task definitions
+- one scheduler-owned Temporal workflow per `scheduleId`
+- one concrete scheduled launch request per due occurrence
+- occurrence-scoped issue-workflow ids so repeated recurring launches do not collide
+
+Still deferred after this expansion:
+
+- richer overlap behavior than `skip` and `allow_parallel`
+- pause, resume, backfill, and cancel lifecycle beyond registration-time validation
+- migration to Temporal server Schedule objects if later needed
+
+## Recurring Scheduler Workflow
+
+Recurring schedules need a durable cadence owner inside Temporal.
+
+The clean v1 shape is:
+
+- one scheduler workflow per `scheduleId`
+- the scheduler workflow owns cadence, catchup, and overlap decisions for that schedule
+- the scheduler workflow does not own metaswarm business execution
+- each concrete occurrence still flows through the launch/materialization layer and starts a top-level issue workflow
+
+This avoids two weak designs:
+
+- repo-local schedule ledgers that try to mirror runtime timers
+- direct recurring starts with static workflow arguments that bypass per-occurrence launch normalization
+
+The scheduler workflow is therefore a narrow control-plane exception, not a second business workflow model.
+
 ## Invariants
 
 1. A schedule definition must not carry workflow phase state.
@@ -154,6 +196,31 @@ For one-off delayed schedules, the scheduler may use Temporal `startDelay` or an
 5. A schedule definition must align with the referenced task-definition mode.
 6. The scheduler must converge on the same launch and workflow-input contracts used by ad hoc execution.
 7. Repo-local schedule files are configuration only, not schedule execution truth.
+8. A recurring schedule must produce one concrete scheduled launch request per due occurrence before the issue workflow starts.
+9. Recurring cadence, overlap, and catchup state must remain Temporal runtime truth.
+
+## Recurring Launch Semantics
+
+For recurring schedules:
+
+- `initiatedAt` is when the scheduler workflow decides to launch the occurrence
+- `scheduledFor` is the occurrence time derived from the cadence
+- `occurrenceKey` is a deterministic schedule-local key derived from `scheduledFor`
+- the launch/materialization layer uses that concrete occurrence to create a normal launch record and workflow input
+- recurring launches that target an existing BEADS issue may still produce multiple runs for the same issue over time
+- recurring launches that create a new BEADS issue must materialize before the issue workflow starts, just like ad hoc create-new launches
+
+Recommended recurring issue-workflow id shape:
+
+```text
+issue-<beads-id>-schedule-<schedule-id>-run-<run-id>
+```
+
+Recommended recurring scheduler workflow id shape:
+
+```text
+schedule-<schedule-id>
+```
 
 ## Example: One-Off
 

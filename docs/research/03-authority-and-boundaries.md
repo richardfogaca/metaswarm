@@ -91,6 +91,8 @@ This includes:
 
 For delayed one-off scheduling, this means timer state should live in Temporal runtime mechanisms such as delayed start or schedule execution state, not in repo-local schedule ledgers that try to mirror runtime timekeeping.
 
+For recurring scheduling, this also means cadence cursor, overlap decisions, and catchup decisions should live in Temporal execution state, not in repo-local files.
+
 ### Contract 3: Human Approval Must Be Durable Before Resume
 
 A Temporal signal alone is not sufficient.
@@ -119,6 +121,8 @@ Recommended identity model:
 - branches, worktrees, and reports also carry the BEADS id
 
 For recurring scheduled runs, the recurring definition should have its own stable schedule id, and each resulting runtime execution should still map back to the BEADS business id created or targeted by that run.
+
+If recurring cadence is implemented through a scheduler-owned workflow, that workflow may use its own stable control-plane id. Each launched issue workflow must still carry a concrete run id and map back to the resolved BEADS target for that occurrence.
 
 ### Contract 7: Reconciliation Before Action
 

@@ -205,6 +205,18 @@ Step 3 should not proceed without these concrete tests:
 5. scenario tests prove a schedule-triggered launch and an ad hoc launch converge on the same workflow input and launch-record shape apart from trigger-specific fields
 6. launch-record tests prove schedule-triggered runs record `scheduleId`, `triggerType`, and delayed-start metadata without introducing repo-local schedule truth
 
+## Step 3 Expansion Practical Test Matrix
+
+The recurring scheduler slice should not proceed without these concrete tests:
+
+1. schedule-definition contract accepts valid recurring definitions for the supported cadence kinds and rejects unsupported overlap/catchup combinations
+2. recurring schedule preparation rejects paused schedules, task-definition mode mismatches, and malformed timezone or cadence shapes
+3. deterministic workflow tests prove the scheduler workflow launches repeated occurrences on cadence and survives worker restart without losing its launch cursor
+4. deterministic workflow tests prove `overlapPolicy: "skip"` suppresses overlapping occurrences while `allow_parallel` permits them
+5. deterministic workflow tests prove `catchupPolicy: "none"` drops stale occurrences while `within_window` launches only the due occurrences still inside the configured window
+6. launch tests prove recurring existing-target and recurring create-new schedules both emit explicit launch records with `scheduleId`, `scheduledFor`, and one concrete resolved BEADS target
+7. scenario tests prove recurring launches feed the same issue-workflow contract as ad hoc and delayed-once launches apart from schedule-specific metadata
+
 ## Acceptance Standard
 
 The implementation is on track only if the operator can eventually trust this experience:

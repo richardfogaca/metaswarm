@@ -99,6 +99,8 @@ They should not themselves encode metaswarm workflow logic.
 
 For a one-off delayed start, the thinnest acceptable scheduler shape is one that converts schedule configuration into the same launch contract used by ad hoc runs and lets Temporal own the actual timer.
 
+For recurring starts, a dedicated scheduler-owned Temporal workflow is a reasonable v1 shape when it is the simplest way to keep cadence, catchup, and overlap decisions durable while still producing explicit per-occurrence launch records before the issue workflow begins.
+
 ## Why Not Child Workflows In v1
 
 This does not mean child workflows are bad.
@@ -138,6 +140,12 @@ Possible later uses for child workflows:
 - a very large work unit with its own long lifecycle
 - a release lane with genuinely separate timing
 - a recursive sub-epic that behaves like a separate service boundary
+
+Narrow exception:
+
+- a scheduler-owned workflow whose only job is recurring cadence management and launch triggering
+
+That exception is acceptable because it is control-plane plumbing, not business workflow decomposition.
 
 ## Example Overnight Sequence
 
