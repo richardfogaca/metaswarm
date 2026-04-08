@@ -78,6 +78,8 @@ This includes:
 - subtask/work-unit decomposition state
 - workflow-visible blocked/ready/completed state
 
+For the restricted Step 4 slice, this workflow truth may be represented as a narrow BEADS-backed workflow-state projection. That projection is acceptable only if BEADS remains the durable authority and Temporal still re-reads it before action.
+
 ### Contract 2: Temporal Owns Runtime Truth
 
 BEADS should not be repurposed into a homemade scheduler or sleep ledger.
@@ -111,6 +113,8 @@ Plans, code, reviews, and summaries remain provisional until validated and accep
 ### Contract 5: External Events Are Inputs, Not Commands
 
 GitHub comments, CI changes, and review arrivals can wake the runtime, but they should not directly mutate workflow truth.
+
+In the restricted Step 4 slice, this means an external-observation wakeup must trigger refresh and then BEADS reconciliation. The external event alone is never sufficient to continue.
 
 ### Contract 6: One Stable Business Identifier
 

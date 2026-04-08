@@ -16,6 +16,15 @@ The desired runtime pattern is:
 8. if blocked on a human or an external condition, it waits
 9. on wakeup, it re-reads authoritative state before continuing
 
+For the restricted Step 4 slice, that authoritative state may be a small BEADS-backed projection that only answers:
+
+- complete now
+- sleep until a timestamp
+- wait for human approval
+- wait for refreshed external observation
+
+This is enough to prove safe wakeup behavior without claiming the full metaswarm policy engine has already been encoded in runtime form.
+
 This loop assumes a higher-level structure around it:
 
 - a task definition tells the system what should run

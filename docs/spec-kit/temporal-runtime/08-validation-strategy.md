@@ -217,6 +217,18 @@ The recurring scheduler slice should not proceed without these concrete tests:
 6. launch tests prove recurring existing-target and recurring create-new schedules both emit explicit launch records with `scheduleId`, `scheduledFor`, and one concrete resolved BEADS target
 7. scenario tests prove recurring launches feed the same issue-workflow contract as ad hoc and delayed-once launches apart from schedule-specific metadata
 
+## Step 4 Practical Test Matrix
+
+The restricted Step 4 slice should not proceed without these concrete tests:
+
+1. workflow-state contract accepts the restricted BEADS-backed state shapes and rejects malformed sleep, approval, and observation waits
+2. activity tests prove BEADS workflow-state reads parse authoritative metadata correctly and fail loudly when the required state is missing or malformed
+3. deterministic workflow tests prove the workflow re-reads BEADS after timer wake before progressing
+4. deterministic workflow tests prove a `human_approval` or `manual_resume` signal alone does not advance the workflow when BEADS state still says approval is pending
+5. deterministic workflow tests prove that changing BEADS state and then delivering a wake signal allows safe continuation
+6. deterministic workflow tests prove `await_external_observation` triggers the refresh activity before the workflow re-reads BEADS and decides whether it can continue
+7. scenario tests prove blocked and sleeping summaries remain operator-facing state while the workflow stays open
+
 ## Acceptance Standard
 
 The implementation is on track only if the operator can eventually trust this experience:

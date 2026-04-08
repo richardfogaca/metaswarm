@@ -211,6 +211,31 @@ Phase exit gate:
 
 - do not proceed until stale-state progression and signal-only approval shortcuts are impossible in tested scenarios
 
+Step 4 restricted profile:
+
+- use a BEADS-backed authoritative workflow-state projection rather than the temporary Step 1 `runtimeSkeleton`
+- support only four authoritative states:
+  - `complete`
+  - `sleep_until`
+  - `await_human_approval`
+  - `await_external_observation`
+- treat signal delivery as a wakeup only, never as workflow truth
+- refresh external observation before continuing from observation waits
+- keep full metaswarm phase derivation deferred
+
+This slice is intentionally narrower than the eventual end state.
+
+It proves the hardest safety property first:
+
+- the runtime always re-reads authority before acting
+
+Explicitly defer after the restricted Step 4 slice:
+
+- full metaswarm phase derivation from BEADS
+- real work-unit execution decisions
+- durable writes of accepted workflow progress back into richer BEADS state
+- multi-signal coordination beyond the small wakeup set above
+
 ### Step 5: Late-Stage Durability
 
 Build:

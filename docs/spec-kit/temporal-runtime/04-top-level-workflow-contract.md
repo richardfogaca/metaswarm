@@ -61,6 +61,12 @@ Step 3 schedule rule:
 - Temporal delay or scheduling metadata stays outside BEADS workflow truth
 - recurring cadence ownership may live in a separate scheduler workflow, but the issue workflow still starts only after one concrete launch has been materialized
 
+Step 4 authority rule:
+
+- the workflow may omit `runtimeSkeleton` once it is driven by authoritative BEADS workflow state
+- in that mode, BEADS must tell the workflow whether it should complete, sleep, or remain blocked
+- the workflow must not invent progression from stale in-memory assumptions or from signal delivery alone
+
 ## Output Contract
 
 ```ts
@@ -100,6 +106,62 @@ Deferred until later steps:
 - real metaswarm phase execution
 
 The `runtimeSkeleton` field exists only so Step 1 can prove runtime behavior without pretending Step 4 policy wiring is already implemented. It is a temporary implementation aid, not the long-term home of workflow law.
+
+## Step 4 Restricted Profile
+
+Step 4 should still begin with a narrow, explicit authority model.
+
+The first honest Step 4 slice is not full metaswarm phase execution.
+
+It is:
+
+- BEADS-backed authoritative workflow state
+- start and wake reconciliation
+- signal handling that never bypasses BEADS truth
+- external observation refresh before continuation from observation waits
+
+Restricted authoritative state contract for Step 4:
+
+```ts
+type Step4WorkflowState = {
+  version: 1;
+  kind:
+    | "complete"
+    | "sleep_until"
+    | "await_human_approval"
+    | "await_external_observation";
+  sleepUntil?: string;
+  blockers?: string[];
+  humanActionRequired?: string | null;
+  stepsAttempted?: string[];
+  acceptedChanges?: string[];
+  validationSummary?: ValidationSummary;
+  lastUpdatedAt: string;
+};
+```
+
+Recommended BEADS metadata location:
+
+```json
+{
+  "temporal_workflow_state": {
+    "...": "..."
+  }
+}
+```
+
+Interpretation rules for the restricted profile:
+
+- `complete` means the workflow may emit a terminal summary and finish
+- `sleep_until` means the workflow emits a sleeping summary, sleeps until the provided timestamp, and then re-reads BEADS before doing anything else
+- `await_human_approval` means the workflow emits a blocked summary and waits for a resume-style signal, but it still re-reads BEADS before continuing
+- `await_external_observation` means the workflow must refresh external observation through an activity, then re-read BEADS before it can continue
+
+Important limit:
+
+- this state contract is a restricted projection of workflow truth for Step 4 only
+- it is not yet the full metaswarm policy engine encoded in BEADS
+- richer next-step derivation remains deferred to later workflow phases
 
 ## Responsibilities
 
@@ -162,6 +224,13 @@ Rule:
 
 Step 1 does not implement signals yet. Signals are deferred so timer sleep/wake behavior can be proven in isolation first.
 
+Step 4 restricted signal rules:
+
+- `human_approval` and `manual_resume` may only wake a blocked workflow; they do not authorize progress by themselves
+- after either signal, the workflow must re-read BEADS and only continue if authoritative state has changed
+- `external_observation_changed` may wake a workflow waiting on external state, but the workflow must run the refresh activity before re-reading BEADS and deciding what to do next
+- duplicate signals must be harmless
+
 ## Invariants
 
 1. The top-level workflow is the default owner of the issue lifecycle.
@@ -171,6 +240,8 @@ Step 1 does not implement signals yet. Signals are deferred so timer sleep/wake 
 5. The workflow must emit a run summary on every terminal or sleeping outcome.
 
 For Step 1, invariant 2 is satisfied by deferral: the implementation must not invent stale BEADS-derived progression after wakeup because it is not yet allowed to derive progression from BEADS at all.
+
+For the restricted Step 4 slice, invariant 3 is satisfied by the narrow state machine above. The runtime proves reconciliation and safe wake behavior without claiming it already implements the full metaswarm step engine.
 
 ## Failure Model
 
