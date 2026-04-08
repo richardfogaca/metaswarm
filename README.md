@@ -161,7 +161,12 @@ The Temporal runtime now supports a local development stack:
 - `npm run temporal:worker` starts the real host-side metaswarm worker
 - `npm run temporal:dev:down` stops the local stack
 
-See [docs/temporal-dev.md](docs/temporal-dev.md) for the local runtime workflow and environment defaults.
+See:
+
+- [docs/temporal-dev.md](docs/temporal-dev.md) for the local runtime workflow and environment defaults
+- [guides/temporal-runtime.md](guides/temporal-runtime.md) for the current runtime model
+- [docs/plans/2026-04-08-temporal-runtime-design.md](docs/plans/2026-04-08-temporal-runtime-design.md) for the canonical Temporal design
+- [docs/plans/2026-04-08-temporal-runtime-plan.md](docs/plans/2026-04-08-temporal-runtime-plan.md) for the implementation plan and phase record
 
 ## Self-Learning System
 

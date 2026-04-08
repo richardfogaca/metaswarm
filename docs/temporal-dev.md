@@ -2,6 +2,8 @@
 
 This repo can run the Temporal-backed metaswarm runtime against a local Docker Compose stack.
 
+For the current runtime model and artifact conventions, see [guides/temporal-runtime.md](/Users/richard/git/personal/metaswarm/guides/temporal-runtime.md).
+
 The development boundary is intentional:
 
 - Temporal services run in Docker
