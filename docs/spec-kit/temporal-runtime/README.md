@@ -38,6 +38,13 @@ This spec kit defines:
 
 This spec kit does not claim current implementation.
 
+Validation is part of the implementation spec.
+
+Use:
+
+- [07-implementation-roadmap.md](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/07-implementation-roadmap.md) for per-phase validation requirements
+- [08-validation-strategy.md](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/08-validation-strategy.md) for the shared validation model and test layers
+
 ## Document Map
 
 - [01-system-overview.md](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/01-system-overview.md)
@@ -47,6 +54,7 @@ This spec kit does not claim current implementation.
 - [05-subtask-and-work-unit-model.md](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/05-subtask-and-work-unit-model.md)
 - [06-morning-review-artifact.md](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/06-morning-review-artifact.md)
 - [07-implementation-roadmap.md](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/07-implementation-roadmap.md)
+- [08-validation-strategy.md](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/08-validation-strategy.md)
 
 ## Design Summary
 
