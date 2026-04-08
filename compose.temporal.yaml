@@ -1,0 +1,44 @@
+services:
+  temporal-postgresql:
+    image: postgres:16-alpine
+    container_name: metaswarm-temporal-postgresql
+    environment:
+      POSTGRES_USER: temporal
+      POSTGRES_PASSWORD: temporal
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U temporal']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - metaswarm-temporal-postgresql-data:/var/lib/postgresql/data
+
+  temporal:
+    image: temporalio/auto-setup:latest
+    container_name: metaswarm-temporal
+    depends_on:
+      temporal-postgresql:
+        condition: service_healthy
+    environment:
+      DB: postgres12
+      DB_PORT: 5432
+      POSTGRES_USER: temporal
+      POSTGRES_PWD: temporal
+      POSTGRES_SEEDS: temporal-postgresql
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CLI_ADDRESS: temporal:7233
+    ports:
+      - '${METASWARM_TEMPORAL_PORT:-7233}:7233'
+
+  temporal-ui:
+    image: temporalio/ui:latest
+    container_name: metaswarm-temporal-ui
+    depends_on:
+      - temporal
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+    ports:
+      - '${METASWARM_TEMPORAL_UI_PORT:-8080}:8080'
+
+volumes:
+  metaswarm-temporal-postgresql-data:

@@ -153,6 +153,16 @@ and a delivery log UI.
 
 See [INSTALL.md](INSTALL.md) for prerequisites, platform-specific details, and migration from older versions.
 
+## Temporal Runtime Development
+
+The Temporal runtime now supports a local development stack:
+
+- `npm run temporal:dev:up` starts local Temporal services with Docker Compose
+- `npm run temporal:worker` starts the real host-side metaswarm worker
+- `npm run temporal:dev:down` stops the local stack
+
+See [docs/temporal-dev.md](docs/temporal-dev.md) for the local runtime workflow and environment defaults.
+
 ## Self-Learning System
 
 metaswarm doesn't just execute — it learns from every session and gets smarter over time.

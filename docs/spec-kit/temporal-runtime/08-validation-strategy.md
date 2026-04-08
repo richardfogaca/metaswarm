@@ -274,6 +274,20 @@ The restricted Step 8 slice should not proceed without these concrete tests:
 7. CLI tests prove human-readable output and `--json` output both surface launch-ref, summary-ref, runtime posture, blockers, and human action requirements cleanly
 8. scenario tests prove one delayed scheduled run can be inspected after registration and after completion without manually opening runtime JSON files
 
+## Step 9 Practical Test Matrix
+
+The restricted Step 9 slice should not proceed without these concrete tests:
+
+1. worker runtime config tests prove default local address and namespace are applied when no explicit Temporal env is provided
+2. worker runtime config tests prove `TEMPORAL_ADDRESS` and `TEMPORAL_NAMESPACE` override defaults cleanly, and metaswarm-specific aliases normalize to the same effective config if supported
+3. worker startup tests prove `scripts/temporal-worker.js` still supports `--check` and also supports a real run mode with explicit repo-root handling
+4. compose-wrapper tests prove the local dev command resolves one stable compose file and maps `up`, `down`, and `status` onto deterministic docker compose invocations
+5. script tests prove docker-not-installed or compose-not-available failures are surfaced clearly instead of degrading silently
+6. compose contract tests prove host port overrides are expressed through environment variables instead of hardcoded alternate files or hidden script behavior
+7. worker startup tests prove unreachable Temporal endpoints fail within a bounded startup path instead of hanging indefinitely
+8. scenario tests prove a real worker connected to the configured local Temporal endpoint can process one delayed scheduled run and emit the expected launch and review artifacts
+9. documentation checks prove the same commands used in validation are the ones documented for developers
+
 ## Acceptance Standard
 
 The implementation is on track only if the operator can eventually trust this experience:

@@ -113,6 +113,13 @@ For recurring starts, a dedicated scheduler-owned Temporal workflow is a reasona
 
 For the restricted Step 5 slice, late-stage side effects may be executed through a small idempotent action boundary that writes derived runtime receipts keyed by a durable `actionKey`. That receipt is an audit and replay guard only. It does not replace BEADS workflow truth.
 
+For the restricted local-development stack slice, the clean runtime shape is:
+
+- Temporal infrastructure in local containers
+- one host-side metaswarm worker connected to that local Temporal server
+
+This gives developers a real runtime without pretending the worker itself should already be containerized alongside repo-local authority.
+
 ## Why Not Child Workflows In v1
 
 This does not mean child workflows are bad.

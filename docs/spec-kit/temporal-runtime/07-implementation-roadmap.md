@@ -445,6 +445,57 @@ Explicitly defer after the restricted Step 8 slice:
 - structured runtime event logging
 - multi-run listing and filtering surfaces
 - dashboard or TUI interfaces
+
+### Step 9: Local Development Stack
+
+Build:
+
+- one local Docker Compose stack for Temporal services
+- one real host-side worker run mode
+- one documented local validation path
+
+Must prove:
+
+- developers can run the Temporal runtime locally without inventing a fake production deployment model
+- local runtime startup is reproducible and explicit
+- repo and BEADS authority stay on the host even when Temporal services run in containers
+
+Validation strategy:
+
+- contract tests for worker runtime config parsing and compose command resolution
+- script tests for compose up/down/status wrappers and worker startup argument handling
+- scenario test proving a local worker can connect to the configured local Temporal endpoint and process one delayed scheduled run
+- documentation check proving the validation path is explicit and consistent with the implemented commands
+
+Phase exit gate:
+
+- do not proceed until a developer can start local Temporal services, start a real worker against them, validate one run, and shut the environment down without manual hidden setup
+
+Step 9 restricted profile:
+
+- containers host Temporal infrastructure only
+- the metaswarm worker runs on the host
+- local worker defaults to `localhost:7233` and namespace `default`
+- one stable compose file defines the local Temporal stack
+- the compose wrapper prefers `docker compose` and only falls back to `docker-compose` when needed
+- host port collisions are handled through documented compose port overrides rather than by silently changing worker defaults
+- one worker command supports both `--check` and real run mode
+- worker startup uses a bounded connection timeout so missing local services fail clearly
+- optional convenience wrappers may compose the same stack and worker path, but must not create a second runtime implementation
+
+This slice is intentionally narrower than a general deployment story.
+
+It proves the sixth hard safety property:
+
+- local developer ergonomics can improve without blurring runtime authority or forcing repo-local tooling into containers
+
+Explicitly defer after the restricted Step 9 slice:
+
+- containerized worker execution
+- production deployment manifests
+- Kubernetes or cloud deployment support
+- containerized BEADS, git, or GitHub CLI integration
+- watch mode and structured event streaming
 - mutation controls such as resume, cancel, or retry from the status surface
 
 ## Non-Negotiable Validation Rules

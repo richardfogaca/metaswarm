@@ -3,6 +3,11 @@
   "version": "0.11.0",
   "description": "Cross-platform installer for metaswarm — multi-agent orchestration for Claude Code, Codex CLI, and Gemini CLI",
   "scripts": {
+    "temporal:dev": "npm run temporal:dev:up && npm run temporal:worker",
+    "temporal:dev:down": "node scripts/temporal-dev.js down",
+    "temporal:dev:status": "node scripts/temporal-dev.js status",
+    "temporal:dev:up": "node scripts/temporal-dev.js up",
+    "temporal:worker": "node scripts/temporal-worker.js",
     "temporal:worker:check": "node scripts/temporal-worker.js --check",
     "test:temporal-bootstrap": "node --test tests/runtime/test-temporal-bootstrap.js",
     "test:temporal-step1": "node --test tests/runtime/test-temporal-contracts.js tests/runtime/test-issue-workflow.js",
@@ -13,7 +18,8 @@
     "test:temporal-step5": "node --test tests/runtime/test-step5-late-stage-actions.js tests/runtime/test-step5-issue-workflow.js",
     "test:temporal-step6": "node --test tests/runtime/test-step6-spec-to-plan-actions.js tests/runtime/test-step6-issue-workflow.js",
     "test:temporal-step7": "node --test tests/runtime/test-step7-work-unit-actions.js tests/runtime/test-step7-issue-workflow.js",
-    "test:temporal-step8": "node --test tests/runtime/test-temporal-status.js tests/runtime/test-temporal-status-cli.js"
+    "test:temporal-step8": "node --test tests/runtime/test-temporal-status.js tests/runtime/test-temporal-status-cli.js",
+    "test:temporal-step9": "node --test tests/runtime/test-temporal-runtime-config.js tests/runtime/test-temporal-dev-stack.js tests/runtime/test-temporal-worker-script.js tests/runtime/test-temporal-dev-script.js tests/runtime/test-temporal-dev-docs.js"
   },
   "bin": {
     "metaswarm": "cli/metaswarm.js"

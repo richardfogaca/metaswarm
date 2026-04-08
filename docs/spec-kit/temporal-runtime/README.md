@@ -35,6 +35,7 @@ This spec kit defines:
 - subtask and work-unit model
 - morning review artifact contract
 - operator status surface
+- local development stack
 - implementation roadmap
 
 This spec kit does not claim current implementation.
@@ -57,6 +58,7 @@ Use:
 - [07-implementation-roadmap.md](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/07-implementation-roadmap.md)
 - [08-validation-strategy.md](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/08-validation-strategy.md)
 - [09-operator-status-surface.md](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/09-operator-status-surface.md)
+- [10-local-development-stack.md](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/10-local-development-stack.md)
 
 ## Design Summary
 
@@ -71,3 +73,4 @@ The intended division of labor is:
 - subtasks stay inside the parent workflow by default
 - morning review artifacts are derived read models for the operator
 - operator status surfaces are merged read models for inspection only
+- local development infrastructure exists to host Temporal services, not to replace host-side repo authority

@@ -146,6 +146,19 @@ After every wakeup, retry, or signal:
 
 Do not continue from stale in-memory assumptions alone.
 
+### Contract 8: Local Containers Must Not Capture Repo Authority
+
+For the restricted local-development slice, containerized services may host Temporal infrastructure only.
+
+They must not quietly become the durable home for:
+
+- `.metaswarm/runtime` repo state
+- `.beads` workflow truth
+- git credentials or branch state
+- host tool installations such as `bd` or `gh`
+
+The host-side worker remains the component that touches repo-local authority and developer credentials.
+
 ## Safety Rules
 
 ### No dual workflow authority

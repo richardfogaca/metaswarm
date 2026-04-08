@@ -1,14 +1,20 @@
 #!/usr/bin/env node
 'use strict';
 
+const { Connection, Client } = require('@temporalio/client');
+const { Worker, NativeConnection } = require('@temporalio/worker');
+
 const {
   createWorkerBootstrapOptions,
   ensureRuntimeDirectories,
 } = require('../lib/runtime/temporal/bootstrap');
 const { createTemporalActivities } = require('../lib/runtime/temporal/activities');
+const { resolveTemporalRuntimeConfig } = require('../lib/runtime/temporal/runtime-config');
 
 function printUsage() {
-  console.error('Usage: node scripts/temporal-worker.js --check [--repo-root <path>]');
+  console.error(
+    'Usage: node scripts/temporal-worker.js [--check] [--repo-root <path>]'
+  );
 }
 
 function parseArgs(argv) {
@@ -40,23 +46,124 @@ function parseArgs(argv) {
   return args;
 }
 
-function buildCheckSummary(repoRoot) {
-  const runtimePaths = ensureRuntimeDirectories(repoRoot);
-  const workerOptions = createWorkerBootstrapOptions({
+function buildCheckSummary(repoRoot, env = process.env) {
+  const runtimeConfig = resolveTemporalRuntimeConfig({
     repoRoot,
-    activities: createTemporalActivities({ repoRoot }),
+    env,
+  });
+  const runtimePaths = ensureRuntimeDirectories(runtimeConfig.repoRoot);
+  const workerOptions = createWorkerBootstrapOptions({
+    repoRoot: runtimeConfig.repoRoot,
+    activities: createTemporalActivities({ repoRoot: runtimeConfig.repoRoot }),
   });
 
   return {
-    repoRoot,
+    repoRoot: runtimeConfig.repoRoot,
     taskQueue: workerOptions.taskQueue,
     workflowsPath: workerOptions.workflowsPath,
     activityNames: Object.keys(workerOptions.activities),
     runtimePaths,
+    temporal: {
+      address: runtimeConfig.address,
+      namespace: runtimeConfig.namespace,
+      uiUrl: runtimeConfig.uiUrl,
+      connectTimeoutMs: runtimeConfig.connectTimeoutMs,
+    },
   };
 }
 
-function main() {
+async function ensureServerReachable({
+  address,
+  connectTimeoutMs,
+  connectClient = Connection.connect,
+} = {}) {
+  let connection;
+  try {
+    connection = await connectClient({
+      address,
+      connectTimeout: connectTimeoutMs,
+    });
+  } catch (error) {
+    throw new Error(
+      `Unable to reach Temporal server at ${address} within ${connectTimeoutMs}ms: ${error.message}`
+    );
+  } finally {
+    if (connection) {
+      await connection.close();
+    }
+  }
+}
+
+function installShutdownHandlers(worker) {
+  const handleShutdownSignal = () => {
+    worker.shutdown();
+  };
+
+  process.once('SIGINT', handleShutdownSignal);
+  process.once('SIGTERM', handleShutdownSignal);
+
+  return () => {
+    process.removeListener('SIGINT', handleShutdownSignal);
+    process.removeListener('SIGTERM', handleShutdownSignal);
+  };
+}
+
+async function runWorker({
+  repoRoot = process.cwd(),
+  env = process.env,
+  connectClient = options => Connection.connect(options),
+  connectNative = options => NativeConnection.connect(options),
+  createWorker = options => Worker.create(options),
+  createClient = options => new Client(options),
+  createActivities = createTemporalActivities,
+} = {}) {
+  const runtimeConfig = resolveTemporalRuntimeConfig({
+    repoRoot,
+    env,
+  });
+  ensureRuntimeDirectories(runtimeConfig.repoRoot);
+
+  await ensureServerReachable({
+    address: runtimeConfig.address,
+    connectTimeoutMs: runtimeConfig.connectTimeoutMs,
+    connectClient,
+  });
+
+  const nativeConnection = await connectNative({
+    address: runtimeConfig.address,
+  });
+
+  try {
+    const client = createClient({
+      connection: nativeConnection,
+      namespace: runtimeConfig.namespace,
+    });
+    const workerOptions = createWorkerBootstrapOptions({
+      repoRoot: runtimeConfig.repoRoot,
+      activities: createActivities({
+        repoRoot: runtimeConfig.repoRoot,
+        client,
+      }),
+    });
+
+    const worker = await createWorker({
+      ...workerOptions,
+      connection: nativeConnection,
+      namespace: runtimeConfig.namespace,
+    });
+    const removeShutdownHandlers = installShutdownHandlers(worker);
+
+    try {
+      await worker.run();
+    } finally {
+      removeShutdownHandlers();
+    }
+  } finally {
+    await nativeConnection.close();
+  }
+}
+
+async function main() {
   let args;
   try {
     args = parseArgs(process.argv.slice(2));
@@ -67,15 +174,26 @@ function main() {
     return;
   }
 
-  if (!args.check) {
-    printUsage();
-    process.exitCode = 1;
+  if (args.check) {
+    process.stdout.write(`${JSON.stringify(buildCheckSummary(args.repoRoot), null, 2)}\n`);
     return;
   }
 
-  process.stdout.write(`${JSON.stringify(buildCheckSummary(args.repoRoot), null, 2)}\n`);
+  await runWorker({
+    repoRoot: args.repoRoot,
+  });
 }
 
 if (require.main === module) {
-  main();
+  main().catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });
 }
+
+module.exports = {
+  buildCheckSummary,
+  ensureServerReachable,
+  parseArgs,
+  runWorker,
+};

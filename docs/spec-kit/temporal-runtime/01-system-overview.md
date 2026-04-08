@@ -163,6 +163,20 @@ Does not own:
 - runtime truth
 - launch truth
 
+### Local Development Stack
+
+Owns:
+
+- local Temporal infrastructure for developer use
+- reproducible local runtime startup commands
+
+Does not own:
+
+- workflow truth
+- repo state
+- BEADS state
+- the host-side worker execution environment
+
 ## Primary Runtime Rule
 
 The scheduler controls time, not workflow law.
@@ -196,3 +210,8 @@ They do not invent their own workflow semantics.
 6. Morning review artifacts are read models only.
 
 Scheduler-owned workflows are allowed only as a narrow control-plane exception for recurring cadence management. They do not replace the top-level issue workflow as the business execution unit.
+
+Implementation note for local development:
+
+- a local compose stack may host Temporal services such as the server and UI
+- the metaswarm worker should still run on the host in the restricted development slice so it can use the real repo, BEADS state, and host toolchain without container duplication
