@@ -129,6 +129,7 @@ The runtime must prove:
 - a summary artifact is emitted on sleeping, blocked, failed, and completed outcomes
 - the summary contains valid required fields
 - the summary remains a read model and does not become authoritative state
+- sleeping and blocked states are asserted through the artifact or workflow inspection surface, not through workflow completion values
 
 ## Failure Injection
 
@@ -156,6 +157,17 @@ A phase is considered proven only when:
 5. its explicit phase exit gate in the roadmap is satisfied
 
 If any of those are missing, the phase is not actually proven.
+
+## Step 1 Practical Test Matrix
+
+Step 1 should not proceed without these concrete tests:
+
+1. input contract accepts the restricted Step 1 profile and rejects malformed timer directives
+2. output contract accepts terminal workflow completion only
+3. summary artifact contract accepts sleeping and completed artifacts for the same run id
+4. workflow test proves immediate completion emits a valid artifact and terminal result
+5. workflow test proves timer sleep emits a sleeping artifact, wakes deterministically, and then completes cleanly
+6. activity test proves summary materialization can rewrite the same per-run artifact path idempotently
 
 ## Architectural Assertions To Re-Check Every Phase
 

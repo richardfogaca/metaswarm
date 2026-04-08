@@ -4,7 +4,8 @@
   "description": "Cross-platform installer for metaswarm — multi-agent orchestration for Claude Code, Codex CLI, and Gemini CLI",
   "scripts": {
     "temporal:worker:check": "node scripts/temporal-worker.js --check",
-    "test:temporal-bootstrap": "node --test tests/runtime/test-temporal-bootstrap.js"
+    "test:temporal-bootstrap": "node --test tests/runtime/test-temporal-bootstrap.js",
+    "test:temporal-step1": "node --test tests/runtime/test-temporal-contracts.js tests/runtime/test-issue-workflow.js"
   },
   "bin": {
     "metaswarm": "cli/metaswarm.js"

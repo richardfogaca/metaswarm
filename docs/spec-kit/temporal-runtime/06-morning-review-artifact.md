@@ -20,6 +20,8 @@ This is a read model only.
 
 It is not workflow authority.
 
+It is also the authoritative operator-facing surface for non-terminal runtime states such as sleeping or blocked while the workflow is still open.
+
 ## Contract
 
 ```ts
@@ -113,6 +115,8 @@ Suggested locations:
 .metaswarm/runtime/reviews/<run-id>.md
 ```
 
+The JSON file is required. Markdown is optional in early phases.
+
 These are derived artifacts.
 
 They should be rebuildable from:
@@ -121,6 +125,15 @@ They should be rebuildable from:
 - BEADS task state
 - validation outputs
 - repo state
+
+The per-run artifact path is stable. The runtime may rewrite the same artifact as the run crosses reporting boundaries:
+
+- sleeping
+- blocked
+- failed
+- completed
+
+This keeps the operator surface simple: one run, one current review file.
 
 ## Example JSON
 
@@ -153,6 +166,18 @@ They should be rebuildable from:
   "humanActionRequired": "Approve checkpoint to continue into implementation"
 }
 ```
+
+## Step 1 Minimum Expectations
+
+For Step 1, the artifact may be intentionally sparse as long as it remains valid and high signal.
+
+Acceptable Step 1 defaults:
+
+- `stepsAttempted: ["runtime-skeleton"]`
+- `acceptedChanges: []`
+- empty `testsRun`, `checksRun`, `passes`, `failures`, and `warnings`
+
+Step 1 is proving runtime behavior, not full workflow semantics.
 
 ## Operator Experience Rule
 

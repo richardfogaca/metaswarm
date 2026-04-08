@@ -5,7 +5,7 @@ const {
   createWorkerBootstrapOptions,
   ensureRuntimeDirectories,
 } = require('../lib/runtime/temporal/bootstrap');
-const { bootstrapActivities } = require('../lib/runtime/temporal/activities');
+const { createTemporalActivities } = require('../lib/runtime/temporal/activities');
 
 function printUsage() {
   console.error('Usage: node scripts/temporal-worker.js --check [--repo-root <path>]');
@@ -44,7 +44,7 @@ function buildCheckSummary(repoRoot) {
   const runtimePaths = ensureRuntimeDirectories(repoRoot);
   const workerOptions = createWorkerBootstrapOptions({
     repoRoot,
-    activities: bootstrapActivities,
+    activities: createTemporalActivities({ repoRoot }),
   });
 
   return {

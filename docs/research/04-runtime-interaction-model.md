@@ -170,6 +170,8 @@ This should be a read model only.
 
 It should not become workflow authority.
 
+When a workflow is sleeping or blocked, this artifact is the operator-facing state surface while the workflow remains open. A sleeping workflow does not have a terminal return value yet.
+
 ## Morning Review Surface
 
 To satisfy the end goal, the runtime must produce a review surface that answers:

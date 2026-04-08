@@ -18,6 +18,22 @@ Build:
 - basic activity boundaries
 - summary emission
 
+Implementation boundary:
+
+- support one workflow per existing BEADS issue
+- prove timer-based sleep and wake behavior
+- emit operator-facing summaries at reporting boundaries
+- keep policy derivation intentionally minimal
+
+Explicitly defer to later steps:
+
+- task materialization from task definitions
+- recurring schedules
+- BEADS reconciliation as the source of next-step derivation
+- human approval signal handling
+- external observation refresh
+- real metaswarm step execution
+
 Must prove:
 
 - one workflow per issue works
@@ -30,6 +46,13 @@ Validation strategy:
 - deterministic workflow tests with fake time for sleep/wake behavior
 - activity tests for summary materialization and idempotent retry handling
 - scenario test for one issue run that sleeps and resumes cleanly
+
+Step 1 restricted profile:
+
+- `beadsTarget.kind` is `existing` only
+- sleeping and blocked states are represented through the emitted review artifact, not through workflow completion
+- the workflow may use a temporary Step 1-only skeleton directive in its input to choose between immediate completion and timer sleep
+- the workflow must emit a summary before sleeping and again on terminal completion if state changed
 
 Phase exit gate:
 
@@ -203,3 +226,5 @@ The first concrete delivery slice should include:
 - one delayed-start schedule
 
 That is the smallest slice that exercises the architecture honestly.
+
+For the actual implementation sequence in this repo, a bootstrap scaffold may land first, but Step 1 is not considered complete until the restricted profile above is proven with deterministic workflow tests.

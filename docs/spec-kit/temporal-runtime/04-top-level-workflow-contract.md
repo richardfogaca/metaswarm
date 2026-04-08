@@ -25,6 +25,7 @@ type IssueWorkflowInput = {
   beadsTarget: BeadsTarget;
   initiatedAt: string;
   initiatedBy: "operator" | "schedule" | "signal";
+  runtimeSkeleton?: Step1RuntimeSkeletonDirective;
 };
 
 type BeadsTarget =
@@ -37,7 +38,21 @@ type BeadsTarget =
       beadsId: string;
       sourceTaskDefinitionId: string;
     };
+
+type Step1RuntimeSkeletonDirective = {
+  mode: "complete" | "sleep_until";
+  sleepUntil?: string;
+  reason?: string;
+};
 ```
+
+Step 1 input rules:
+
+- `runtimeSkeleton` is required for the restricted Step 1 implementation
+- `runtimeSkeleton.mode: "complete"` requires no extra fields
+- `runtimeSkeleton.mode: "sleep_until"` requires `sleepUntil`
+- `sleepUntil` must be a valid timestamp later than `initiatedAt`
+- `reason` is optional operator-facing context for the emitted review artifact
 
 ## Output Contract
 
@@ -46,15 +61,39 @@ type IssueWorkflowResult = {
   version: 1;
   runId: string;
   beadsId: string;
-  runtimeStatus: "completed" | "sleeping" | "blocked" | "failed" | "cancelled";
+  terminalStatus: "completed" | "failed" | "cancelled";
   summaryRef: string;
-  nextAction:
-    | { kind: "none" }
-    | { kind: "wait_for_human"; reason: string }
-    | { kind: "wait_for_external"; reason: string }
-    | { kind: "resume_at"; at: string; reason: string };
 };
 ```
+
+`summaryRef` should be a repo-relative path to the latest JSON review artifact for the run:
+
+```text
+.metaswarm/runtime/reviews/<run-id>.json
+```
+
+Sleeping or blocked states do not appear as workflow return values because a sleeping Temporal workflow has not completed yet. Those states are surfaced through the latest emitted review artifact while the workflow remains open.
+
+## Step 1 Restricted Profile
+
+Step 1 is intentionally narrower than the full end-state contract.
+
+Supported in Step 1:
+
+- `beadsTarget.kind: "existing"`
+- immediate completion or timer-based sleep chosen through `runtimeSkeleton`
+- summary emission before sleep and on terminal completion
+- deterministic timer wakeup
+
+Deferred until later steps:
+
+- `beadsTarget.kind: "materialized"`
+- BEADS-driven next-step derivation
+- human approval signals
+- external observation refresh
+- real metaswarm phase execution
+
+The `runtimeSkeleton` field exists only so Step 1 can prove runtime behavior without pretending Step 4 policy wiring is already implemented. It is a temporary implementation aid, not the long-term home of workflow law.
 
 ## Responsibilities
 
@@ -68,6 +107,8 @@ The top-level workflow must:
 6. write accepted state back to BEADS
 7. wait safely at human and external boundaries
 8. emit a review artifact
+
+In Step 1, responsibilities 2 through 6 are intentionally reduced to contract validation plus summary emission. Full BEADS reconciliation and policy derivation begin in Step 4.
 
 ## Core Loop
 
@@ -93,6 +134,11 @@ Activities should cover:
 - PR operations
 - summary materialization
 
+Step 1 minimum activity set:
+
+- summary materialization
+- optional no-op or stub adapters for BEADS lookup/read boundaries
+
 ## Signal Contract
 
 Expected signal types:
@@ -109,6 +155,8 @@ Rule:
 - no signal may advance workflow semantics by itself
 - the workflow must re-read authoritative state before acting
 
+Step 1 does not implement signals yet. Signals are deferred so timer sleep/wake behavior can be proven in isolation first.
+
 ## Invariants
 
 1. The top-level workflow is the default owner of the issue lifecycle.
@@ -116,6 +164,8 @@ Rule:
 3. Workflow progression must still follow metaswarm rules.
 4. Human approval must be durable before resume.
 5. The workflow must emit a run summary on every terminal or sleeping outcome.
+
+For Step 1, invariant 2 is satisfied by deferral: the implementation must not invent stale BEADS-derived progression after wakeup because it is not yet allowed to derive progression from BEADS at all.
 
 ## Failure Model
 
@@ -130,6 +180,8 @@ If the worker crashes:
 
 - Temporal restores runtime state
 - workflow reconciles from BEADS before continuing
+
+In Step 1, recovery proof focuses on timer determinism and summary emission. BEADS reconciliation after crash remains a later-step responsibility.
 
 ## Recommended Workflow Id Shape
 
