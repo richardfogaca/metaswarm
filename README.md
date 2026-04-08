@@ -66,6 +66,7 @@ Your prompt (spec with DoD items) or GitHub Issue
 ```text
 metaswarm/
 ├── .claude-plugin/
+│   ├── marketplace.json      # Claude Code marketplace catalog for this repo
 │   └── plugin.json           # Claude Code plugin manifest
 ├── gemini-extension.json      # Gemini CLI extension manifest
 ├── .codex/
@@ -109,34 +110,69 @@ metaswarm/
 
 ## Install
 
-### Claude Code (recommended)
+### 1. Install a host CLI
+
+**Claude Code** ([official setup](https://code.claude.com/docs/en/setup))
 
 ```bash
-claude plugin marketplace add dsifry/metaswarm-marketplace
-claude plugin install metaswarm
+curl -fsSL https://claude.ai/install.sh | bash
+claude
+```
+
+**Gemini CLI** ([official setup](https://google-gemini.github.io/gemini-cli/docs/get-started/))
+
+```bash
+npm install -g @google/gemini-cli
+gemini
+```
+
+**Codex CLI** ([official setup](https://developers.openai.com/codex/cli))
+
+```bash
+npm i -g @openai/codex
+codex
+```
+
+### 2. Install metaswarm into that CLI
+
+**Claude Code**
+
+```bash
+claude plugin marketplace add richardfogaca/metaswarm
+claude plugin install metaswarm@richardfogaca-tools
 ```
 
 Then run `/setup` in Claude Code.
 
-### Gemini CLI
+**Gemini CLI**
 
 ```bash
-gemini extensions install https://github.com/dsifry/metaswarm.git
+gemini extensions install https://github.com/richardfogaca/metaswarm.git
 ```
 
 Then run `/metaswarm:setup` in your project.
 
-### Codex CLI
+**Codex CLI**
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/dsifry/metaswarm/main/.codex/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/richardfogaca/metaswarm/main/.codex/install.sh | bash
 ```
 
 Then run `$setup` in your project.
 
+### Claude Official Directory
+
+This repo now includes [`.claude-plugin/marketplace.json`](/Users/richard/git/personal/metaswarm/.claude-plugin/marketplace.json), so `richardfogaca/metaswarm` works as a repo-hosted Claude marketplace immediately. To publish metaswarm in Anthropic's shared plugin directory, submit this plugin through Anthropic's form after validating it locally:
+
+```bash
+claude plugin validate .
+```
+
+Anthropic documents directory submission at `https://claude.ai/settings/plugins/submit` and `https://platform.claude.com/plugins/submit`.
+
 ### Cross-platform installer
 
-Detect installed CLIs and install metaswarm for all of them:
+After you install one or more CLIs, detect them and install metaswarm for all of them:
 
 ```bash
 npx metaswarm init
@@ -217,9 +253,9 @@ This means the knowledge base can grow to hundreds or thousands of entries witho
 
 | Platform | Install Method | Commands |
 |---|---|---|
-| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | Plugin marketplace | `/start-task`, `/setup`, etc. |
-| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | Extension (`gemini extensions install`) | `/metaswarm:start-task`, etc. |
-| [Codex CLI](https://github.com/openai/codex) | Skills (`curl \| bash`) | `$start`, `$setup`, etc. |
+| [Claude Code](https://code.claude.com/docs/en/setup) | Repo-hosted plugin marketplace | `/start-task`, `/setup`, etc. |
+| [Gemini CLI](https://google-gemini.github.io/gemini-cli/docs/get-started/) | Extension (`gemini extensions install`) | `/metaswarm:start-task`, etc. |
+| [Codex CLI](https://developers.openai.com/codex/cli) | Skills (`curl \| bash`) | `$start`, `$setup`, etc. |
 
 ## Requirements
 

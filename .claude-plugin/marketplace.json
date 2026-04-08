@@ -1,0 +1,34 @@
+{
+  "name": "richardfogaca-tools",
+  "owner": {
+    "name": "Richard Fogaca"
+  },
+  "metadata": {
+    "description": "Community marketplace for metaswarm and related Claude Code plugins",
+    "version": "0.11.0"
+  },
+  "plugins": [
+    {
+      "name": "metaswarm",
+      "source": {
+        "source": "github",
+        "repo": "richardfogaca/metaswarm"
+      },
+      "description": "Multi-agent orchestration framework for Claude Code, Gemini CLI, and Codex CLI",
+      "version": "0.11.0",
+      "author": {
+        "name": "Richard Fogaca"
+      },
+      "homepage": "https://github.com/richardfogaca/metaswarm",
+      "repository": "https://github.com/richardfogaca/metaswarm",
+      "license": "MIT",
+      "keywords": [
+        "orchestration",
+        "agents",
+        "tdd",
+        "quality-gates",
+        "beads"
+      ]
+    }
+  ]
+}

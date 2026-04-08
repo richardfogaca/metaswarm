@@ -7,13 +7,13 @@ Install metaswarm's 13 orchestration skills for [Codex CLI](https://github.com/o
 ### Quick install
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/dsifry/metaswarm/main/.codex/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/richardfogaca/metaswarm/main/.codex/install.sh | bash
 ```
 
 ### Manual install
 
 ```bash
-git clone https://github.com/dsifry/metaswarm.git ~/.codex/metaswarm
+git clone https://github.com/richardfogaca/metaswarm.git ~/.codex/metaswarm
 mkdir -p ~/.agents/skills
 for d in ~/.codex/metaswarm/skills/*/; do
   ln -sf "$d" ~/.agents/skills/metaswarm-$(basename "$d")

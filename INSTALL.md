@@ -2,11 +2,36 @@
 
 metaswarm works with Claude Code, Gemini CLI, and Codex CLI. Install for one platform or all three.
 
-## Claude Code (Plugin Marketplace)
+## 1. Install a Host CLI
+
+### Claude Code
 
 ```bash
-claude plugin marketplace add dsifry/metaswarm-marketplace
-claude plugin install metaswarm
+curl -fsSL https://claude.ai/install.sh | bash
+claude
+```
+
+### Gemini CLI
+
+```bash
+npm install -g @google/gemini-cli
+gemini
+```
+
+### Codex CLI
+
+```bash
+npm i -g @openai/codex
+codex
+```
+
+## 2. Install metaswarm
+
+### Claude Code (Plugin Marketplace)
+
+```bash
+claude plugin marketplace add richardfogaca/metaswarm
+claude plugin install metaswarm@richardfogaca-tools
 ```
 
 Then in Claude Code:
@@ -18,7 +43,7 @@ Then in Claude Code:
 ## Gemini CLI (Extension)
 
 ```bash
-gemini extensions install https://github.com/dsifry/metaswarm.git
+gemini extensions install https://github.com/richardfogaca/metaswarm.git
 ```
 
 Then in Gemini CLI:
@@ -30,7 +55,7 @@ Then in Gemini CLI:
 ## Codex CLI (Skills)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/dsifry/metaswarm/main/.codex/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/richardfogaca/metaswarm/main/.codex/install.sh | bash
 ```
 
 Then in Codex CLI:
@@ -65,11 +90,26 @@ npx metaswarm setup
 
 | Feature | Claude Code | Gemini CLI | Codex CLI |
 |---|---|---|---|
-| Install method | Plugin marketplace | `gemini extensions install` | Clone + symlink |
+| Install method | Repo-hosted plugin marketplace | `gemini extensions install` | Clone + symlink |
 | Commands | `/start-task` | `/metaswarm:start-task` | `$start` |
 | Instruction file | `CLAUDE.md` | `GEMINI.md` | `AGENTS.md` |
 | Parallel agents | Full (`Task()`) | Experimental | Sequential only |
 | Setup command | `/setup` | `/metaswarm:setup` | `$setup` |
+
+## Claude Marketplace Publishing
+
+This repo now ships [`.claude-plugin/marketplace.json`](/Users/richard/git/personal/metaswarm/.claude-plugin/marketplace.json), so users can install metaswarm directly from this repository with `claude plugin marketplace add richardfogaca/metaswarm`.
+
+To publish metaswarm into Anthropic's shared plugin directory instead of only this repo-hosted marketplace:
+
+1. Validate the plugin locally:
+   ```bash
+   claude plugin validate .
+   ```
+2. Submit the plugin with Anthropic's official form:
+   - `https://claude.ai/settings/plugins/submit`
+   - `https://platform.claude.com/plugins/submit`
+3. After Anthropic approves the listing, update the install docs again to point at the shared directory entry if you want the shorter official install path.
 
 ## Prerequisites
 
@@ -135,8 +175,8 @@ This is the most common upgrade path. Your project has metaswarm files in `.clau
 
 1. **Install the plugin:**
    ```bash
-   claude plugin marketplace add dsifry/metaswarm-marketplace
-   claude plugin install metaswarm
+   claude plugin marketplace add richardfogaca/metaswarm
+   claude plugin install metaswarm@richardfogaca-tools
    ```
 
 2. **Run the migration** in Claude Code:

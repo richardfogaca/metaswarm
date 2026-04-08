@@ -6,8 +6,8 @@
     "name": "David Sifry",
     "email": "david@sifry.com"
   },
-  "homepage": "https://github.com/dsifry/metaswarm",
-  "repository": "https://github.com/dsifry/metaswarm",
+  "homepage": "https://github.com/richardfogaca/metaswarm",
+  "repository": "https://github.com/richardfogaca/metaswarm",
   "license": "MIT",
   "keywords": ["orchestration", "agents", "tdd", "quality-gates", "beads"]
 }

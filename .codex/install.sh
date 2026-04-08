@@ -3,7 +3,7 @@
 # Install metaswarm skills for Codex CLI
 #
 # Usage:
-#   curl -sSL https://raw.githubusercontent.com/dsifry/metaswarm/main/.codex/install.sh | bash
+#   curl -sSL https://raw.githubusercontent.com/richardfogaca/metaswarm/main/.codex/install.sh | bash
 #   # or
 #   bash .codex/install.sh  (from cloned repo)
 
@@ -11,7 +11,7 @@ set -euo pipefail
 
 INSTALL_DIR="${CODEX_HOME:-$HOME/.codex}/metaswarm"
 SKILLS_DIR="$HOME/.agents/skills"
-REPO_URL="https://github.com/dsifry/metaswarm.git"
+REPO_URL="https://github.com/richardfogaca/metaswarm.git"
 
 echo ""
 echo "  metaswarm — Codex CLI installer"

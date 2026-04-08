@@ -43,17 +43,17 @@ const METASWARM_MARKER = '## metaswarm';
 function installClaude() {
   console.log('\n  Installing for Claude Code...\n');
   try {
-    console.log('  Running: claude plugin marketplace add dsifry/metaswarm-marketplace');
-    execSync('claude plugin marketplace add dsifry/metaswarm-marketplace', { stdio: 'inherit' });
-    console.log('  Running: claude plugin install metaswarm');
-    execSync('claude plugin install metaswarm', { stdio: 'inherit' });
+    console.log('  Running: claude plugin marketplace add richardfogaca/metaswarm');
+    execSync('claude plugin marketplace add richardfogaca/metaswarm', { stdio: 'inherit' });
+    console.log('  Running: claude plugin install metaswarm@richardfogaca-tools');
+    execSync('claude plugin install metaswarm@richardfogaca-tools', { stdio: 'inherit' });
     info('Claude Code plugin installed');
     console.log('  Next: Open Claude Code and run /setup');
   } catch (e) {
     warn(`Claude Code install failed: ${e.message}`);
     console.log('  Try manually:');
-    console.log('    claude plugin marketplace add dsifry/metaswarm-marketplace');
-    console.log('    claude plugin install metaswarm');
+    console.log('    claude plugin marketplace add richardfogaca/metaswarm');
+    console.log('    claude plugin install metaswarm@richardfogaca-tools');
   }
 }
 
@@ -75,7 +75,7 @@ function installCodex() {
     console.log(`  Cloning metaswarm to ${installDir}...`);
     mkdirp(path.dirname(installDir));
     try {
-      execSync(`git clone https://github.com/dsifry/metaswarm.git "${installDir}"`, { stdio: 'inherit' });
+      execSync(`git clone https://github.com/richardfogaca/metaswarm.git "${installDir}"`, { stdio: 'inherit' });
       info('Cloned metaswarm');
     } catch (e) {
       warn(`Clone failed: ${e.message}`);
@@ -116,14 +116,14 @@ function installCodex() {
 function installGemini() {
   console.log('\n  Installing for Gemini CLI...\n');
   try {
-    console.log('  Running: gemini extensions install https://github.com/dsifry/metaswarm.git');
-    execSync('gemini extensions install https://github.com/dsifry/metaswarm.git', { stdio: 'inherit' });
+    console.log('  Running: gemini extensions install https://github.com/richardfogaca/metaswarm.git');
+    execSync('gemini extensions install https://github.com/richardfogaca/metaswarm.git', { stdio: 'inherit' });
     info('Gemini CLI extension installed');
     console.log('  Next: In your project, run /metaswarm:setup');
   } catch (e) {
     warn(`Gemini CLI install failed: ${e.message}`);
     console.log('  Try manually:');
-    console.log('    gemini extensions install https://github.com/dsifry/metaswarm.git');
+    console.log('    gemini extensions install https://github.com/richardfogaca/metaswarm.git');
   }
 }
 
