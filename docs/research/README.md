@@ -17,6 +17,30 @@ This is not a generic "add scheduling" project. It is a reliability and operator
 - the system should pause and resume safely
 - the next-day review surface should make clear what happened, what changed, what passed, what failed, and what still needs a human
 
+## What This Research Is Correcting
+
+One distinction needs to stay explicit throughout this research:
+
+- metaswarm already orchestrates tasks and subtasks in the workflow sense
+- Temporal is being considered to add durable scheduling and unattended runtime behavior around that orchestration
+
+So the point is not:
+
+- "metaswarm cannot orchestrate work"
+
+The point is:
+
+- metaswarm appears to already know how to drive the SDLC flow
+- BEADS already carries durable workflow context and recovery state
+- what is still missing for the end goal is a first-class runtime for:
+  - one-off delayed execution
+  - daily, weekly, monthly, or custom recurring schedules
+  - reliable sleeps and wakeups
+  - durable retries across long unattended runs
+  - clean next-day execution history and summary surfaces
+
+This matters because the architecture should wrap metaswarm's strengths, not re-implement them.
+
 ## Design Posture
 
 The integration should stay straightforward and elegant:
@@ -56,6 +80,12 @@ The recommended architecture is:
 - metaswarm for workflow law and quality policy
 - BEADS for durable workflow and task truth
 - Temporal for durable runtime execution
+
+The intended division of labor is:
+
+- metaswarm decides what should happen next
+- BEADS records the task graph and workflow-facing truth
+- Temporal makes that process schedulable, durable, and unattended-safe
 
 The first implementation slice should be narrow:
 

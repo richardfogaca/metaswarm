@@ -10,6 +10,13 @@ Reach the end state:
 
 The path to that objective should stay incremental and clean.
 
+One clarification is important:
+
+- metaswarm already appears capable of orchestrating task and subtask flow
+- this roadmap is about making that orchestration schedulable and durably unattended
+
+The roadmap is not about replacing metaswarm's workflow engine.
+
 ## Guiding Rule
 
 Start with a single workflow.
@@ -41,6 +48,7 @@ Success criteria:
 - wakeups and retries are deterministic
 - idempotency rules are in place
 - a basic operator summary exists
+- the runtime can support at least one delayed-start use case cleanly
 
 ## Phase 2: Late-Stage Durability
 
@@ -67,7 +75,27 @@ Success criteria:
 - operator review the next day is clear
 - no duplicated side effects occur during retries
 
-## Phase 3: Spec-To-Plan Lane
+## Phase 3: Scheduling Surface
+
+Goal:
+
+- support explicit operator scheduling without changing metaswarm workflow semantics
+
+Suggested scope:
+
+- one-off delayed task start
+- recurring schedules
+- schedule definitions for daily, weekly, monthly, and custom cadence runs
+- cancellation and pause behavior for scheduled runs
+
+Success criteria:
+
+- a task can be scheduled to run later exactly once
+- a recurring workflow can be scheduled on a durable cadence
+- schedule metadata stays clearly separate from workflow truth
+- scheduled starts and resumed runs still produce a clear morning summary
+
+## Phase 4: Spec-To-Plan Lane
 
 Goal:
 
@@ -88,7 +116,7 @@ Success criteria:
 - review isolation semantics are preserved
 - the system stops cleanly at real human gates
 
-## Phase 4: Work-Unit Execution
+## Phase 5: Work-Unit Execution
 
 Goal:
 
@@ -114,7 +142,7 @@ Success criteria:
 - workflow truth stays coherent
 - overnight implementation results are reviewable in the morning
 
-## Phase 5: Expansion Only After Proof
+## Phase 6: Expansion Only After Proof
 
 Only after the earlier phases are proven should the architecture consider:
 
@@ -134,5 +162,6 @@ The integration is accomplishing its purpose when this is normal:
 3. the system pauses safely at real human boundaries
 4. the operator wakes up and can quickly review a trustworthy summary
 5. the operator understands what to approve, revise, or continue next
+6. both one-off scheduled tasks and recurring scheduled tasks feel like first-class operator features rather than hacks
 
 That is the product outcome the roadmap should optimize for.

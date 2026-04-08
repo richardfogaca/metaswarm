@@ -14,6 +14,20 @@ The clean architecture is:
 
 This is a wrapper model, not a replacement model.
 
+It is important to be precise about what is already true today:
+
+- metaswarm already appears to orchestrate tasks, work units, review gates, and PR follow-through
+- BEADS already appears to preserve enough workflow state for context recovery
+
+Temporal is not being introduced because metaswarm lacks a workflow engine.
+
+Temporal is being introduced so that the existing workflow engine can become:
+
+- schedulable
+- durable across restarts
+- safer for unattended overnight runs
+- suitable for delayed and recurring execution
+
 ## Components
 
 ### metaswarm Workflow Policy Layer
@@ -39,6 +53,13 @@ metaswarm remains the answer to:
 - what counts as passing
 - what requires revision
 - when to escalate to a human
+
+metaswarm already covers:
+
+- top-level issue orchestration
+- subtask and work-unit decomposition
+- gate sequencing
+- retry and escalation rules inside the workflow
 
 ### BEADS
 
@@ -74,6 +95,14 @@ Role:
 - execution history
 
 Temporal should be the runtime authority, not the workflow authority.
+
+Temporal should answer questions like:
+
+- run this task at 2 AM tomorrow
+- run this maintenance task every Monday at 9 AM
+- keep this workflow sleeping until a timer or signal wakes it
+- retry this activity safely after a worker restart
+- tell me what happened overnight
 
 ### Issue Orchestrator
 
@@ -158,3 +187,34 @@ The simplest initial topology is:
 - schedules for recurring starts and wakeups
 
 That is enough to prove the model without overcomplicating it.
+
+## Scheduling Model
+
+The architecture should eventually support two runtime entry modes:
+
+### 1. One-Off Scheduled Tasks
+
+Examples:
+
+- start task `X` later tonight
+- start task `Y` tomorrow at 14:00
+- resume a paused workflow at a planned checkpoint time
+
+### 2. Recurring Scheduled Tasks
+
+Examples:
+
+- run daily
+- run weekly
+- run monthly
+- run on a custom schedule
+
+Examples of recurring work that fit this model:
+
+- maintenance and curation tasks
+- recurring review or reporting tasks
+- recurring implementation tasks generated from templates or queue rules
+
+The key point is that the scheduling surface should start workflows and wake workflows.
+
+It should not redefine metaswarm's internal workflow semantics.

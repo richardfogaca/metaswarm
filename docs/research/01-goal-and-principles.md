@@ -17,6 +17,12 @@ The system must be able to:
 - survive process restarts and long waits
 - make the next-day review legible
 - preserve metaswarm's quality posture instead of trading it away for speed
+- support scheduled execution patterns such as:
+  - run once later
+  - run daily
+  - run weekly
+  - run monthly
+  - run on a custom recurring cadence
 
 ## Why Temporal
 
@@ -32,6 +38,23 @@ metaswarm already appears strong on workflow quality:
 - PR shepherding
 - closure and learning
 
+metaswarm also already appears to have meaningful workflow durability conventions:
+
+- work queue and worktree assignment
+- pause and resume concepts
+- background PR shepherding in supported environments
+- persisted execution state and recovery through BEADS
+
+So the problem is not "metaswarm has no orchestration."
+
+The problem is that metaswarm does not yet appear to provide a single general-purpose durable runtime and scheduler for arbitrary unattended task execution across:
+
+- one-off delayed jobs
+- recurring jobs
+- long sleeps
+- resumable waits
+- unified runtime history
+
 What it lacks as a first-class substrate is durable runtime behavior:
 
 - schedules
@@ -41,6 +64,12 @@ What it lacks as a first-class substrate is durable runtime behavior:
 - durable history across process restarts
 
 Temporal is a candidate to provide those runtime capabilities without replacing metaswarm's process model.
+
+Put differently:
+
+- metaswarm is the workflow brain
+- BEADS is the durable task and context substrate
+- Temporal would be the clock, timer, wakeup, and retry engine
 
 ## Primary Design Principles
 
@@ -66,6 +95,13 @@ Temporal should contribute:
 - retries
 - schedules
 - history
+
+It should specifically make these scheduling modes first-class:
+
+- start a task later at a specific time
+- start a task on a recurring cadence
+- wake a paused workflow when time-based conditions are met
+- keep unattended work alive across worker restarts
 
 It should not become a new source of workflow semantics.
 
@@ -116,6 +152,11 @@ At the beginning, do not try to:
 - redesign the whole architecture at once
 - maximize parallelism before the basic runtime path is proven
 
+Also do not assume:
+
+- that Temporal needs to replace metaswarm's existing task/subtask orchestration
+- that every kind of background behavior needs to become a child workflow
+
 ## Success Criteria
 
 The Temporal addition is succeeding only if it makes this workflow real:
@@ -125,3 +166,4 @@ The Temporal addition is succeeding only if it makes this workflow real:
 3. the system pauses safely when human input is genuinely required
 4. the next morning the operator can understand the state quickly
 5. the operator can trust that the workflow did not silently bypass metaswarm quality gates
+6. the same system can support both ad hoc runs and recurring schedules without inventing a second orchestration model
