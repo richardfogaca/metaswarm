@@ -9,6 +9,9 @@
 .beads/context/
 .beads/plans/
 
+# Temporal runtime derived artifacts
+.metaswarm/runtime/reviews/
+
 # Secrets
 .env
 .env.*
