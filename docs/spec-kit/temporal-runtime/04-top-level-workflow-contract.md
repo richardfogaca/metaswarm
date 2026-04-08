@@ -225,6 +225,68 @@ Important limit:
 - BEADS still decides whether the workflow should keep waiting, run another action, or complete
 - the restricted profile supports only the two action kinds above and does not yet claim full PR shepherd automation
 
+## Step 6 Restricted Profile
+
+Step 6 should extend the same authority model rather than embedding a planning engine inside the workflow.
+
+The first honest Step 6 slice is not full metaswarm intake through implementation handoff.
+
+It is:
+
+- idempotent research and planning actions
+- idempotent plan-review and optional design-review gate actions
+- persisted planning artifacts that remain derived accepted outputs, not workflow authority
+- clean stop behavior at real human approval gates using the existing approval model
+
+Restricted spec-to-plan additions:
+
+```ts
+type Step6WorkflowState =
+  | Step5WorkflowState
+  | {
+      version: 1;
+      kind: "run_spec_to_plan_action";
+      specToPlanAction: SpecToPlanAction;
+      blockers?: string[];
+      stepsAttempted?: string[];
+      acceptedChanges?: string[];
+      validationSummary?: ValidationSummary;
+      lastUpdatedAt: string;
+    };
+
+type SpecToPlanAction = {
+  kind:
+    | "research_brief"
+    | "draft_plan"
+    | "run_plan_review_gate"
+    | "run_design_review_gate";
+  actionKey: string;
+  artifactKey: string;
+  sourceArtifactKey?: string;
+  instructions?: string;
+};
+```
+
+Interpretation rules for the restricted profile:
+
+- `run_spec_to_plan_action` means the workflow must execute exactly one idempotent planning activity using `specToPlanAction.actionKey`
+- that activity must persist one stable planning artifact at `specToPlanAction.artifactKey`
+- after the action completes, the workflow must re-read BEADS before deciding whether to continue, wait for approval, or complete
+- `run_plan_review_gate` and `run_design_review_gate` are gate-execution actions only; approval and continuation authority still live in BEADS
+
+Recommended planning artifact location:
+
+```text
+.metaswarm/runtime/planning-artifacts/<artifact-key>.json
+```
+
+Important limit:
+
+- planning artifacts are derived accepted outputs and replay guards only
+- planning artifacts must not become workflow truth or gate authority
+- the restricted profile supports only the four action kinds above and does not yet claim full spec-intake or implementation handoff
+- reviewer fan-out and richer gate semantics remain deferred
+
 ## Responsibilities
 
 The top-level workflow must:
@@ -299,6 +361,12 @@ Step 5 restricted signal rules:
 - `pr_shepherd_tick` may wake `await_external_observation` states whose `observation.kind` is `pr_shepherd`
 - after either wakeup, the workflow must refresh the relevant observation first and only then re-read BEADS
 - signals still do not authorize action execution or workflow completion by themselves
+
+Step 6 restricted signal rules:
+
+- the existing `human_approval` and `manual_resume` signals remain wakeup-only for planning checkpoints
+- plan-review and design-review actions do not bypass that rule; if BEADS still says approval is pending, the workflow must remain blocked
+- no planning action may self-approve or self-promote the workflow without BEADS state changing first
 
 ## Invariants
 

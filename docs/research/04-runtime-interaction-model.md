@@ -197,6 +197,8 @@ This should be a read model only.
 
 It should not become workflow authority.
 
+For the restricted Step 6 slice, research, plan, and gate outputs may be materialized as stable planning artifacts keyed by durable ids. Those artifacts are replay-safe outputs for the runtime and operator, not authoritative workflow truth.
+
 When a workflow is sleeping or blocked, this artifact is the operator-facing state surface while the workflow remains open. A sleeping workflow does not have a terminal return value yet.
 
 ## Morning Review Surface

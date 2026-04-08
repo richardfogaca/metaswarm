@@ -38,6 +38,10 @@ test('resolveRuntimePaths keeps runtime data under .metaswarm/runtime', () => {
     paths.actionReceiptsDir,
     path.join(repoRoot, '.metaswarm', 'runtime', 'action-receipts')
   );
+  assert.equal(
+    paths.planningArtifactsDir,
+    path.join(repoRoot, '.metaswarm', 'runtime', 'planning-artifacts')
+  );
 });
 
 test('ensureRuntimeDirectories creates the bootstrap directory layout', () => {
@@ -50,6 +54,7 @@ test('ensureRuntimeDirectories creates the bootstrap directory layout', () => {
   assert.ok(fs.statSync(paths.schedulesDir).isDirectory());
   assert.ok(fs.statSync(paths.reviewsDir).isDirectory());
   assert.ok(fs.statSync(paths.actionReceiptsDir).isDirectory());
+  assert.ok(fs.statSync(paths.planningArtifactsDir).isDirectory());
 });
 
 test('toIssueWorkflowId uses the documented issue-<beads-id> shape', () => {

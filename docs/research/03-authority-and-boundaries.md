@@ -118,6 +118,8 @@ In the restricted Step 4 slice, this means an external-observation wakeup must t
 
 In the restricted Step 5 slice, this also means periodic PR shepherd wakeups are just timers or signals that cause observation refresh and BEADS reconciliation. They do not authorize branch mutation, comment posting, or completion by themselves.
 
+In the restricted Step 6 slice, generated research, plans, and gate outputs may be persisted as stable artifacts, but those artifacts are accepted outputs only. They do not authorize workflow progression unless BEADS state changes accordingly.
+
 ### Contract 6: One Stable Business Identifier
 
 Recommended identity model:
@@ -169,6 +171,8 @@ Operations such as:
 must be replay-safe.
 
 For the restricted Step 5 slice, replay safety may be supported by a derived runtime action receipt keyed by a durable `actionKey`, as long as that receipt never becomes workflow authority and the workflow still re-reads BEADS after every action.
+
+The same rule applies to the restricted Step 6 planning lane: a persisted planning artifact may support replay safety and operator review, but it must not become gate authority.
 
 ### No silent reviewer coupling
 

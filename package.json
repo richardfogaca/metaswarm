@@ -10,7 +10,8 @@
     "test:temporal-step3": "node --test tests/runtime/test-schedules.js tests/runtime/test-scheduled-launch.js",
     "test:temporal-step3-expansion": "node --test tests/runtime/test-recurring-schedules.js tests/runtime/test-recurring-schedule-workflow.js tests/runtime/test-recurring-launch.js",
     "test:temporal-step4": "node --test tests/runtime/test-step4-workflow-state.js tests/runtime/test-step4-issue-workflow.js",
-    "test:temporal-step5": "node --test tests/runtime/test-step5-late-stage-actions.js tests/runtime/test-step5-issue-workflow.js"
+    "test:temporal-step5": "node --test tests/runtime/test-step5-late-stage-actions.js tests/runtime/test-step5-issue-workflow.js",
+    "test:temporal-step6": "node --test tests/runtime/test-step6-spec-to-plan-actions.js tests/runtime/test-step6-issue-workflow.js"
   },
   "bin": {
     "metaswarm": "cli/metaswarm.js"

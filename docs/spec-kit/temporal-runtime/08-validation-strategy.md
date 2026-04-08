@@ -240,6 +240,16 @@ The restricted Step 5 slice should not proceed without these concrete tests:
 5. deterministic workflow tests prove `run_late_stage_action` executes through the idempotent boundary, refreshes the relevant observation, and does not duplicate side effects when BEADS still returns the same action state on the next loop
 6. scenario tests prove a review-comment follow-up path can wait, wake, execute a follow-up comment action, reconcile, and complete while summaries remain derived read models
 
+## Step 6 Practical Test Matrix
+
+The restricted Step 6 slice should not proceed without these concrete tests:
+
+1. workflow-state contract accepts `run_spec_to_plan_action` plus valid planning action shapes and rejects malformed `actionKey`, `artifactKey`, or unsupported planning action kinds
+2. activity tests prove spec-to-plan action execution is idempotent by `actionKey` and rewrites or reuses one stable planning artifact path without invoking the underlying adapter twice
+3. deterministic workflow tests prove a draft-plan action can execute, persist its artifact, re-read BEADS, and avoid duplicate planning output when BEADS still returns the same action state on the next loop
+4. deterministic workflow tests prove a plan-review or design-review gate action can execute, persist its gate artifact, and then stop cleanly at `await_human_approval` until BEADS truth changes
+5. scenario tests prove a research or planning run can make meaningful progress overnight, surface operator-facing summaries, and preserve gate semantics without self-approving
+
 ## Acceptance Standard
 
 The implementation is on track only if the operator can eventually trust this experience:

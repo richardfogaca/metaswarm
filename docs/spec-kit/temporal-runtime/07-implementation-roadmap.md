@@ -310,6 +310,31 @@ Phase exit gate:
 
 - do not proceed until the runtime can produce planning progress overnight without weakening plan or design gate semantics
 
+Step 6 restricted profile:
+
+- extend the Step 5 authority model instead of replacing it
+- support one planning state, `run_spec_to_plan_action`, with only four action kinds:
+  - `research_brief`
+  - `draft_plan`
+  - `run_plan_review_gate`
+  - `run_design_review_gate`
+- require every planning action to carry a durable `actionKey` and `artifactKey`
+- execute the action through an idempotent activity boundary, persist one stable planning artifact, and then re-read BEADS
+- keep human approval at checkpoints on the existing `await_human_approval` path
+
+This slice is intentionally narrower than the eventual end state.
+
+It proves the third hard safety property:
+
+- useful planning progress can be made durably without moving planning or gate authority out of BEADS
+
+Explicitly defer after the restricted Step 6 slice:
+
+- full intake materialization and issue decomposition
+- reviewer fan-out and richer review-isolation enforcement
+- gate-to-gate progression beyond the small planning lane
+- direct integration with metaswarm agent hosts beyond the generic idempotent planning boundary
+
 ### Step 7: Work-Unit Execution
 
 Build:
