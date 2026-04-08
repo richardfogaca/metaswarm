@@ -12,6 +12,11 @@ const CWD = process.cwd();
 const VERSION = require(path.join(PKG_ROOT, 'package.json')).version;
 
 const { detectPlatforms, getSummary } = require(path.join(PKG_ROOT, 'lib', 'platform-detect'));
+const {
+  formatTemporalRunStatus,
+  loadTemporalRunStatus,
+  parseStatusCommandArgs,
+} = require(path.join(PKG_ROOT, 'lib', 'runtime', 'temporal', 'status'));
 
 // --- Helpers ---
 
@@ -201,6 +206,7 @@ Usage:
   metaswarm init [flags]        Install metaswarm for detected CLI tools
   metaswarm setup [flags]       Set up metaswarm in the current project
   metaswarm detect              Show which CLI tools are installed
+  metaswarm temporal status     Inspect one Temporal runtime run
   metaswarm --help              Show this help
   metaswarm --version           Show version
 
@@ -222,6 +228,19 @@ Examples:
   npx metaswarm init --codex    Install for Codex CLI only
   npx metaswarm setup           Set up project for detected CLIs
   npx metaswarm detect          Show which CLIs are available
+  npx metaswarm temporal status --latest
+`);
+}
+
+function printTemporalHelp() {
+  console.log(`
+metaswarm temporal status
+
+Usage:
+  metaswarm temporal status --latest [--json]
+  metaswarm temporal status --run-id <run-id> [--json]
+  metaswarm temporal status --workflow-id <workflow-id> [--json]
+  metaswarm temporal status --beads-id <beads-id> [--json]
 `);
 }
 
@@ -277,25 +296,59 @@ function detectCommand() {
   console.log('');
 }
 
+async function temporalCommand(args) {
+  const subcommand = args[0];
+
+  if (subcommand !== 'status' || args.includes('--help')) {
+    printTemporalHelp();
+    if (subcommand !== 'status' && !args.includes('--help')) {
+      throw new Error(`unknown temporal subcommand: ${subcommand ?? '(none)'}`);
+    }
+    return;
+  }
+
+  const parsed = parseStatusCommandArgs(args.slice(1));
+  const statusView = await loadTemporalRunStatus({
+    repoRoot: process.cwd(),
+    selector: parsed.selector,
+  });
+
+  if (parsed.json) {
+    process.stdout.write(`${JSON.stringify(statusView, null, 2)}\n`);
+    return;
+  }
+
+  process.stdout.write(formatTemporalRunStatus(statusView));
+}
+
 // --- Main ---
 
-const args = process.argv.slice(2);
-const cmd = args[0];
+async function main() {
+  const args = process.argv.slice(2);
+  const cmd = args[0];
 
-if (cmd === 'init') {
-  initCommand(args.slice(1));
-} else if (cmd === 'setup') {
-  const flags = new Set(args.slice(1));
-  let platformFlag = null;
-  if (flags.has('--claude')) platformFlag = 'claude';
-  else if (flags.has('--codex')) platformFlag = 'codex';
-  else if (flags.has('--gemini')) platformFlag = 'gemini';
-  else if (flags.has('--all')) platformFlag = 'all';
-  setupProject(platformFlag);
-} else if (cmd === 'detect') {
-  detectCommand();
-} else if (cmd === '--version' || cmd === '-v') {
-  console.log(VERSION);
-} else {
-  printHelp();
+  if (cmd === 'init') {
+    await initCommand(args.slice(1));
+  } else if (cmd === 'setup') {
+    const flags = new Set(args.slice(1));
+    let platformFlag = null;
+    if (flags.has('--claude')) platformFlag = 'claude';
+    else if (flags.has('--codex')) platformFlag = 'codex';
+    else if (flags.has('--gemini')) platformFlag = 'gemini';
+    else if (flags.has('--all')) platformFlag = 'all';
+    setupProject(platformFlag);
+  } else if (cmd === 'detect') {
+    detectCommand();
+  } else if (cmd === 'temporal') {
+    await temporalCommand(args.slice(1));
+  } else if (cmd === '--version' || cmd === '-v') {
+    console.log(VERSION);
+  } else {
+    printHelp();
+  }
 }
+
+main().catch((error) => {
+  console.error(error.message);
+  process.exitCode = 1;
+});

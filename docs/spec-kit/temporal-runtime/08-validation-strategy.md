@@ -261,6 +261,19 @@ The restricted Step 7 slice should not proceed without these concrete tests:
 5. deterministic workflow tests prove that a BEADS-issued new adversarial-review `actionKey` causes a genuinely new review execution, preserving fresh-review semantics across retries
 6. scenario tests prove work-unit progress can surface operator-facing summaries and stop safely at existing human-approval checkpoints without self-committing
 
+## Step 8 Practical Test Matrix
+
+The restricted Step 8 slice should not proceed without these concrete tests:
+
+1. status selector parsing accepts exactly one of `latest`, `run_id`, `workflow_id`, or `beads_id` and rejects ambiguous or malformed queries
+2. status resolution tests prove launch records can be mapped back to the documented workflow-id shapes for ad hoc, delayed-once, and recurring runs
+3. status derivation tests prove live Temporal workflow status is used when available, while artifact-only fallback still produces a useful merged view when Temporal connectivity is unavailable
+4. status derivation tests prove review-artifact `sleeping` and `blocked` states are not flattened into Temporal `RUNNING`
+5. status derivation tests prove `--latest`, `--workflow-id`, and `--beads-id` return the most recent matching run by initiated time rather than arbitrary file ordering
+6. status derivation tests prove lack of explicit live Temporal connection configuration stays local and yields a warning rather than a failed lookup
+7. CLI tests prove human-readable output and `--json` output both surface launch-ref, summary-ref, runtime posture, blockers, and human action requirements cleanly
+8. scenario tests prove one delayed scheduled run can be inspected after registration and after completion without manually opening runtime JSON files
+
 ## Acceptance Standard
 
 The implementation is on track only if the operator can eventually trust this experience:

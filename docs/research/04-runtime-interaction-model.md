@@ -223,3 +223,5 @@ That summary can be built from:
 - validation outputs
 
 But the final operator view should be intentionally simple.
+
+The next operational slice after smoke validation should therefore focus on one explicit status surface, not on a dashboard or a second event system. The surface should merge launch audit, summary artifact, and live Temporal status when available, while remaining read-only.

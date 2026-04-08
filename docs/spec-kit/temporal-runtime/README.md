@@ -34,6 +34,7 @@ This spec kit defines:
 - top-level workflow contract
 - subtask and work-unit model
 - morning review artifact contract
+- operator status surface
 - implementation roadmap
 
 This spec kit does not claim current implementation.
@@ -55,6 +56,7 @@ Use:
 - [06-morning-review-artifact.md](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/06-morning-review-artifact.md)
 - [07-implementation-roadmap.md](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/07-implementation-roadmap.md)
 - [08-validation-strategy.md](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/08-validation-strategy.md)
+- [09-operator-status-surface.md](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/09-operator-status-surface.md)
 
 ## Design Summary
 
@@ -68,3 +70,4 @@ The intended division of labor is:
 - one top-level workflow owns one issue or epic lifecycle
 - subtasks stay inside the parent workflow by default
 - morning review artifacts are derived read models for the operator
+- operator status surfaces are merged read models for inspection only

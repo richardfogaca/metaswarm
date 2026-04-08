@@ -110,6 +110,8 @@ Safe sequence:
 
 Plans, code, reviews, and summaries remain provisional until validated and accepted by the orchestrator.
 
+The same rule applies to operator status views: they are merged inspection surfaces only. They must not become a control plane that mutates workflow truth by itself.
+
 ### Contract 5: External Events Are Inputs, Not Commands
 
 GitHub comments, CI changes, and review arrivals can wake the runtime, but they should not directly mutate workflow truth.

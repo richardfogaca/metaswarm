@@ -393,6 +393,60 @@ Explicitly defer after the restricted Step 7 slice:
 - automatic work-unit decomposition and dependency derivation
 - cross-work-unit merge orchestration and final comprehensive review
 
+### Step 8: Operator Status Surface
+
+Build:
+
+- CLI status lookup
+- merged status read model
+- graceful offline fallback when Temporal status is unavailable
+
+Must prove:
+
+- one operator command can answer what happened or what is happening for one run
+- the status surface remains read-only and does not become workflow authority
+- the system stays usable even when live Temporal connectivity is unavailable
+
+Validation strategy:
+
+- selector resolution tests for latest, run id, workflow id, and BEADS id
+- status derivation tests covering live Temporal status, artifact-only fallback, and launch-only fallback
+- CLI tests for human-readable and JSON output
+- scenario test proving a real delayed scheduled run can be inspected cleanly after launch and after completion
+
+Phase exit gate:
+
+- do not proceed until one operator-facing status command can resolve a run from supported selectors and produce a trustworthy merged view without requiring manual file inspection
+
+Step 8 restricted profile:
+
+- add one command, `metaswarm temporal status`
+- support exactly four selectors:
+  - `--latest`
+  - `--run-id`
+  - `--workflow-id`
+  - `--beads-id`
+- return the most recent run only for `--beads-id`
+- merge status from launch records, review artifacts, and optional live Temporal workflow describe calls
+- preserve richer operator-facing `sleeping` and `blocked` states from the review artifact instead of flattening them to Temporal `RUNNING`
+- attempt live Temporal inspection only when explicit runtime connection configuration is present
+- degrade gracefully to artifact-only inspection when Temporal connectivity is unavailable
+- keep `watch`, streaming logs, and richer observability deferred
+
+This slice is intentionally narrower than the eventual end state.
+
+It proves the fifth hard safety property:
+
+- operator trust can improve through better read models without moving any authority out of BEADS or Temporal
+
+Explicitly defer after the restricted Step 8 slice:
+
+- `metaswarm temporal watch`
+- structured runtime event logging
+- multi-run listing and filtering surfaces
+- dashboard or TUI interfaces
+- mutation controls such as resume, cancel, or retry from the status surface
+
 ## Non-Negotiable Validation Rules
 
 Implementation should not proceed without proving:

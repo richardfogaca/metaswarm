@@ -21,13 +21,14 @@ without replacing:
 
 ## End-State Architecture
 
-The target system has five layers:
+The target system has six layers:
 
 1. task definition layer
 2. launch/materialization layer
 3. scheduler layer
 4. top-level issue workflow layer
 5. morning review/read-model layer
+6. operator status surface layer
 
 ## Component Roles
 
@@ -148,6 +149,19 @@ Owns:
 Does not own:
 
 - workflow truth
+
+### Operator Status Surface
+
+Owns:
+
+- merged operator-facing inspection of run state
+- selector-based lookup by run, workflow, or BEADS target
+
+Does not own:
+
+- workflow truth
+- runtime truth
+- launch truth
 
 ## Primary Runtime Rule
 
