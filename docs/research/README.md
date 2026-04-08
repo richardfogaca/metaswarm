@@ -61,6 +61,10 @@ The architecture should optimize for long-term coherence, not just for getting a
 - [04-runtime-interaction-model.md](/Users/richard/git/personal/metaswarm/docs/research/04-runtime-interaction-model.md)
 - [05-phased-roadmap.md](/Users/richard/git/personal/metaswarm/docs/research/05-phased-roadmap.md)
 
+For implementation-facing contracts and concrete reference material, use:
+
+- [Temporal Runtime Spec Kit](/Users/richard/git/personal/metaswarm/docs/spec-kit/temporal-runtime/README.md)
+
 ## Existing metaswarm Grounding
 
 This research is grounded in the current metaswarm structure:
