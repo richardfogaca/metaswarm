@@ -1,0 +1,68 @@
+# metaswarm + Temporal Research
+
+Date: 2026-04-08
+
+## North Star
+
+The end goal for adding Temporal to metaswarm is:
+
+> I want to be able to fire and forget about a task, so when I go to sleep I can review the task the next day and understand what was done.
+
+That goal drives the architecture.
+
+This is not a generic "add scheduling" project. It is a reliability and operator-experience project:
+
+- metaswarm should keep its quality discipline
+- work should keep progressing while the operator is away
+- the system should pause and resume safely
+- the next-day review surface should make clear what happened, what changed, what passed, what failed, and what still needs a human
+
+## Design Posture
+
+The integration should stay straightforward and elegant:
+
+- start with a single Temporal workflow per issue
+- prove it works and is well tested
+- only then widen the scope
+- preserve clean authority boundaries
+- avoid drifting into a second control plane or a pile of runtime special cases
+
+The architecture should optimize for long-term coherence, not just for getting a demo running.
+
+## Document Map
+
+- [01-goal-and-principles.md](/Users/richard/git/personal/metaswarm/docs/research/01-goal-and-principles.md)
+- [02-component-model.md](/Users/richard/git/personal/metaswarm/docs/research/02-component-model.md)
+- [03-authority-and-boundaries.md](/Users/richard/git/personal/metaswarm/docs/research/03-authority-and-boundaries.md)
+- [04-runtime-interaction-model.md](/Users/richard/git/personal/metaswarm/docs/research/04-runtime-interaction-model.md)
+- [05-phased-roadmap.md](/Users/richard/git/personal/metaswarm/docs/research/05-phased-roadmap.md)
+
+## Existing metaswarm Grounding
+
+This research is grounded in the current metaswarm structure:
+
+- `README.md`
+- `AGENTS.md`
+- `USAGE.md`
+- `skills/orchestrated-execution/SKILL.md`
+- `skills/plan-review-gate/SKILL.md`
+- `skills/design-review-gate/SKILL.md`
+- `agents/issue-orchestrator.md`
+
+## Short Summary
+
+The recommended architecture is:
+
+- metaswarm for workflow law and quality policy
+- BEADS for durable workflow and task truth
+- Temporal for durable runtime execution
+
+The first implementation slice should be narrow:
+
+- one workflow per issue
+- no child workflows in v1
+- strong idempotency rules
+- explicit human gates
+- a clear morning summary surface
+
+That is the smallest design that can plausibly reach the fire-and-forget end goal without turning into a mess.
