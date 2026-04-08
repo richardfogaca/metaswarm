@@ -462,11 +462,12 @@ bd label add <task-id> review:iteration-1
 ### Sync Operations
 
 ```bash
-# Check sync status
-bd sync --status
+# Check local BEADS version-control status
+bd vc status
 
-# Pull updates from main
-bd sync --from-main
+# Pull latest code and BEADS state
+git pull --rebase origin main
+bd dolt pull
 
 # Export to JSONL
 bd export
@@ -771,14 +772,15 @@ bd dep remove <task1> <task2>
 ### BEADS Sync Issues
 
 ```bash
-# Check sync status
-bd sync --status
+# Check local BEADS version-control status
+bd vc status
 
 # Force export
 bd export
 
-# Pull from main
-bd sync --from-main
+# Pull latest code and BEADS state
+git pull --rebase origin main
+bd dolt pull
 ```
 
 ---

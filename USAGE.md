@@ -231,6 +231,8 @@ Prerequisites: `npx playwright install chromium`
 Core commands for task tracking:
 
 ```bash
+# This repo assumes bd >= 1.0.0
+
 # Issue Management
 bd create "Title" --type epic|task|bug --priority 1-5
 bd show <id>
@@ -248,8 +250,10 @@ bd prime                       # Load all relevant knowledge
 bd prime --keywords "auth"     # Filter by keyword
 bd prime --work-type impl      # Filter by work type
 
-# Sync
-bd sync                        # Sync with git
+# BEADS version control and remote sync
+bd vc status                   # Show local BEADS working-set status
+bd dolt pull                   # Pull BEADS state from the Dolt remote
+bd dolt push                   # Push BEADS state to the Dolt remote
 bd export                      # Export to JSONL
 ```
 

@@ -22,6 +22,7 @@ Codex discovers skills by their SKILL.md `name` field. Invoke with `$name` synta
 ## BEADS Issue Tracking
 
 This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
+Repository guidance assumes `bd >= 1.0.0`, which uses explicit `bd dolt` and `bd vc` subcommands instead of `bd sync`.
 
 ```bash
 bd ready              # Find available work

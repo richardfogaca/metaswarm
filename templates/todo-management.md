@@ -97,7 +97,7 @@ bd blocked                        # show all blocked issues
 4. # Complete the work
 5. bd close <id> --reason="Completed in commit <SHA>"
 6. bd ready              # Find next task
-7. bd sync               # Push BEADS changes to git
+7. bd dolt push          # Push BEADS changes to the Dolt remote
 ```
 
 ## Creating New Tasks
@@ -118,4 +118,4 @@ bd dep add <tests-id> <feature-id>  # Tests depend on feature
 - Before context switches: Review and update all in_progress items
 - During long tasks: Periodically update progress with `bd update <id> --notes="..."`
 - After completing features: Close all related issues: `bd close <id1> <id2> ...`
-- At session end: Always run `bd sync`
+- At session end: Always run `bd dolt push`
