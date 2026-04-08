@@ -360,6 +360,39 @@ Phase exit gate:
 
 - do not proceed until the parent workflow can coordinate work units safely and reviewers remain isolated under retry and resume conditions
 
+Step 7 restricted profile:
+
+- extend the Step 6 authority model instead of replacing it
+- support one execution state, `run_work_unit_action`, with only four action kinds:
+  - `implement`
+  - `validate`
+  - `adversarial_review`
+  - `commit`
+- require every work-unit action to carry:
+  - one stable `workUnitId`
+  - one durable `actionKey`
+  - one durable `artifactKey`
+- require `validate`, `adversarial_review`, and `commit` actions to name the upstream accepted artifact through `sourceArtifactKey`
+- execute the action through one idempotent activity boundary, persist one stable work-unit artifact, and then re-read BEADS
+- treat adversarial review freshness as a BEADS-issued new attempt:
+  - replay of the same `actionKey` must reuse the same artifact
+  - retrying review must use a new `actionKey` and `artifactKey`
+- keep work-unit decomposition, retry policy, approval checkpoints, and promotion decisions in BEADS rather than in Temporal memory
+
+This slice is intentionally narrower than the eventual end state.
+
+It proves the fourth hard safety property:
+
+- the parent workflow can coordinate the metaswarm work-unit loop without introducing per-work-unit workflows or weakening fresh-review rules
+
+Explicitly defer after the restricted Step 7 slice:
+
+- real agent-host delegation policy beyond a generic idempotent work-unit action boundary
+- parallel work-unit fan-out inside one parent workflow
+- richer review fan-out semantics beyond one fresh review attempt per BEADS-issued action key
+- automatic work-unit decomposition and dependency derivation
+- cross-work-unit merge orchestration and final comprehensive review
+
 ## Non-Negotiable Validation Rules
 
 Implementation should not proceed without proving:

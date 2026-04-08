@@ -287,6 +287,68 @@ Important limit:
 - the restricted profile supports only the four action kinds above and does not yet claim full spec-intake or implementation handoff
 - reviewer fan-out and richer gate semantics remain deferred
 
+## Step 7 Restricted Profile
+
+Step 7 should extend the same authority model rather than creating a second execution engine inside Temporal.
+
+The first honest Step 7 slice is not full orchestrated execution with parallel work units and real agent-host fan-out.
+
+It is:
+
+- one parent-owned work-unit action lane
+- one idempotent execution boundary for implement, validate, review, and commit attempts
+- stable work-unit artifacts that remain derived runtime outputs, not workflow authority
+- explicit fresh-review semantics through BEADS-issued new review attempts
+
+Restricted work-unit additions:
+
+```ts
+type Step7WorkflowState =
+  | Step6WorkflowState
+  | {
+      version: 1;
+      kind: "run_work_unit_action";
+      workUnitAction: WorkUnitAction;
+      blockers?: string[];
+      humanActionRequired?: string | null;
+      stepsAttempted?: string[];
+      acceptedChanges?: string[];
+      validationSummary?: ValidationSummary;
+      lastUpdatedAt: string;
+    };
+
+type WorkUnitAction = {
+  kind: "implement" | "validate" | "adversarial_review" | "commit";
+  workUnitId: string;
+  actionKey: string;
+  artifactKey: string;
+  sourceArtifactKey?: string;
+  instructions?: string;
+};
+```
+
+Interpretation rules for the restricted profile:
+
+- `run_work_unit_action` means the workflow must execute exactly one idempotent work-unit activity using `workUnitAction.actionKey`
+- that activity must persist one stable work-unit artifact at `workUnitAction.artifactKey`
+- `validate`, `adversarial_review`, and `commit` must identify the immediately upstream accepted artifact through `sourceArtifactKey`
+- after the action completes, the workflow must re-read BEADS before deciding whether to continue, wait, retry, or complete
+- adversarial review freshness is represented by BEADS issuing a new `actionKey` and `artifactKey` for a new review attempt
+- re-reading the same `actionKey` means the same attempt is being replayed and must not spawn a fresh review again
+
+Recommended work-unit artifact location:
+
+```text
+.metaswarm/runtime/work-unit-artifacts/<artifact-key>.json
+```
+
+Important limit:
+
+- work-unit artifacts are derived runtime outputs and replay guards only
+- work-unit artifacts must not become workflow truth, dependency truth, or gate authority
+- the restricted profile supports only one work-unit action at a time inside the parent workflow
+- work-unit decomposition, dependency ordering, and retry policy still belong to BEADS and metaswarm policy
+
 ## Responsibilities
 
 The top-level workflow must:
@@ -367,6 +429,12 @@ Step 6 restricted signal rules:
 - the existing `human_approval` and `manual_resume` signals remain wakeup-only for planning checkpoints
 - plan-review and design-review actions do not bypass that rule; if BEADS still says approval is pending, the workflow must remain blocked
 - no planning action may self-approve or self-promote the workflow without BEADS state changing first
+
+Step 7 restricted signal rules:
+
+- the existing wakeup-only signal rules still apply during work-unit execution checkpoints
+- no `run_work_unit_action` execution may promote the workflow by signal delivery alone
+- a retry or fresh adversarial review requires BEADS state to change to a new `workUnitAction.actionKey` before the workflow may execute the new attempt
 
 ## Invariants
 

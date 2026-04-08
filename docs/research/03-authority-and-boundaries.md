@@ -120,6 +120,8 @@ In the restricted Step 5 slice, this also means periodic PR shepherd wakeups are
 
 In the restricted Step 6 slice, generated research, plans, and gate outputs may be persisted as stable artifacts, but those artifacts are accepted outputs only. They do not authorize workflow progression unless BEADS state changes accordingly.
 
+In the restricted Step 7 slice, work-unit implement, validate, review, and commit outputs may be persisted as stable artifacts keyed by durable ids. Those artifacts remain replay guards and operator-facing outputs only. Fresh adversarial review still requires BEADS to issue a new review attempt identity.
+
 ### Contract 6: One Stable Business Identifier
 
 Recommended identity model:
@@ -173,6 +175,8 @@ must be replay-safe.
 For the restricted Step 5 slice, replay safety may be supported by a derived runtime action receipt keyed by a durable `actionKey`, as long as that receipt never becomes workflow authority and the workflow still re-reads BEADS after every action.
 
 The same rule applies to the restricted Step 6 planning lane: a persisted planning artifact may support replay safety and operator review, but it must not become gate authority.
+
+The same rule applies to the restricted Step 7 work-unit lane: replaying the same `actionKey` must never create duplicate implementation, validation, review, or commit side effects, while a genuinely fresh review retry must use a new BEADS-issued action identity.
 
 ### No silent reviewer coupling
 

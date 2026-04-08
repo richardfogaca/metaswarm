@@ -79,6 +79,8 @@ Examples:
 - `design-review-gate`
 - `wu-001 implement`
 - `wu-001 validate`
+- `wu-001 adversarial-review`
+- `wu-001 commit`
 - `pr-shepherd`
 
 ### `acceptedChanges`
@@ -88,6 +90,8 @@ Should summarize accepted outputs, not raw noise.
 Examples:
 
 - `Approved implementation plan persisted to BEADS`
+- `Work-unit validation artifact recorded for wu-001`
+- `Fresh adversarial review artifact recorded for wu-001`
 - `Created PR #123`
 - `Resolved 4 review threads`
 

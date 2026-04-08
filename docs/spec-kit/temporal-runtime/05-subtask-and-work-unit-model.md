@@ -74,3 +74,9 @@ In v1:
 - no PR-shepherd child workflows
 
 All of that should remain inside the top-level workflow until the base system is proven.
+
+Step 7 restricted implementation note:
+
+- the parent workflow should execute at most one BEADS-issued `run_work_unit_action` at a time
+- implement, validate, adversarial review, and commit should all flow through the same idempotent activity boundary
+- fresh adversarial review on retry should be represented as a new BEADS-issued action identity, not as hidden in-memory reviewer state

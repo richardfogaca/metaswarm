@@ -250,6 +250,17 @@ The restricted Step 6 slice should not proceed without these concrete tests:
 4. deterministic workflow tests prove a plan-review or design-review gate action can execute, persist its gate artifact, and then stop cleanly at `await_human_approval` until BEADS truth changes
 5. scenario tests prove a research or planning run can make meaningful progress overnight, surface operator-facing summaries, and preserve gate semantics without self-approving
 
+## Step 7 Practical Test Matrix
+
+The restricted Step 7 slice should not proceed without these concrete tests:
+
+1. workflow-state contract accepts `run_work_unit_action` plus valid implement, validate, adversarial-review, and commit action shapes and rejects malformed `workUnitId`, `actionKey`, `artifactKey`, or missing `sourceArtifactKey` on downstream phases
+2. activity tests prove work-unit action execution is idempotent by `actionKey` and rewrites or reuses one stable work-unit artifact path without invoking the underlying adapter twice
+3. deterministic workflow tests prove an IMPLEMENT -> VALIDATE -> ADVERSARIAL_REVIEW -> COMMIT sequence can execute through the parent workflow, re-reading BEADS between each accepted step
+4. deterministic workflow tests prove replay of the same adversarial-review `actionKey` reuses the same artifact and does not create a second review attempt
+5. deterministic workflow tests prove that a BEADS-issued new adversarial-review `actionKey` causes a genuinely new review execution, preserving fresh-review semantics across retries
+6. scenario tests prove work-unit progress can surface operator-facing summaries and stop safely at existing human-approval checkpoints without self-committing
+
 ## Acceptance Standard
 
 The implementation is on track only if the operator can eventually trust this experience:
