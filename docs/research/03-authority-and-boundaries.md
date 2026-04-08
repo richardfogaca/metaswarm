@@ -89,6 +89,8 @@ This includes:
 - whether it is retrying
 - which runtime execution produced a given overnight summary
 
+For delayed one-off scheduling, this means timer state should live in Temporal runtime mechanisms such as delayed start or schedule execution state, not in repo-local schedule ledgers that try to mirror runtime timekeeping.
+
 ### Contract 3: Human Approval Must Be Durable Before Resume
 
 A Temporal signal alone is not sufficient.

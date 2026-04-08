@@ -6,7 +6,8 @@
     "temporal:worker:check": "node scripts/temporal-worker.js --check",
     "test:temporal-bootstrap": "node --test tests/runtime/test-temporal-bootstrap.js",
     "test:temporal-step1": "node --test tests/runtime/test-temporal-contracts.js tests/runtime/test-issue-workflow.js",
-    "test:temporal-step2": "node --test tests/runtime/test-task-definitions.js tests/runtime/test-ad-hoc-launch.js"
+    "test:temporal-step2": "node --test tests/runtime/test-task-definitions.js tests/runtime/test-ad-hoc-launch.js",
+    "test:temporal-step3": "node --test tests/runtime/test-schedules.js tests/runtime/test-scheduled-launch.js"
   },
   "bin": {
     "metaswarm": "cli/metaswarm.js"

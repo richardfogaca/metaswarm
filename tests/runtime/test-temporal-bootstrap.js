@@ -15,6 +15,7 @@ const {
   ensureRuntimeDirectories,
   resolveRuntimePaths,
   toIssueWorkflowId,
+  toScheduledWorkflowId,
 } = require(path.join(ROOT, 'lib/runtime/temporal/bootstrap'));
 
 function makeTempRepoRoot() {
@@ -47,6 +48,15 @@ test('ensureRuntimeDirectories creates the bootstrap directory layout', () => {
 test('toIssueWorkflowId uses the documented issue-<beads-id> shape', () => {
   assert.equal(toIssueWorkflowId('bd-1234'), 'issue-bd-1234');
   assert.throws(() => toIssueWorkflowId(''), /beadsId/i);
+});
+
+test('toScheduledWorkflowId uses a schedule-scoped workflow id shape', () => {
+  assert.equal(
+    toScheduledWorkflowId('bd-1234', 'sched-nightly'),
+    'issue-bd-1234-schedule-sched-nightly'
+  );
+  assert.throws(() => toScheduledWorkflowId('', 'sched-nightly'), /beadsId/i);
+  assert.throws(() => toScheduledWorkflowId('bd-1234', ''), /scheduleId/i);
 });
 
 test('createWorkerBootstrapOptions wires task queue, workflow module, and activities', () => {

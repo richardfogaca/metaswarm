@@ -54,6 +54,12 @@ Step 2 launch rule:
 - the workflow receives one concrete `beadsTarget`
 - ad hoc launches that create a new BEADS issue still normalize to `beadsTarget.kind: "existing"` before Temporal execution begins
 
+Step 3 schedule rule:
+
+- scheduled launches still normalize to the same `IssueWorkflowInput` shape
+- `scheduleId` is present for schedule-triggered runs
+- Temporal delay or scheduling metadata stays outside BEADS workflow truth
+
 ## Output Contract
 
 ```ts
@@ -195,3 +201,5 @@ Examples:
 For recurring launches, multiple runs may share the same schedule id but each workflow execution still maps to one concrete BEADS business target.
 
 That concrete target should already have been resolved or created by the launch/materialization layer before the workflow starts.
+
+For delayed-once schedules, a schedule-scoped workflow id may be appropriate if that is the simplest way to keep schedule registration idempotent without weakening the business-id linkage to the BEADS target.

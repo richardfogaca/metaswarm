@@ -97,6 +97,8 @@ Schedules should start or wake workflows.
 
 They should not themselves encode metaswarm workflow logic.
 
+For a one-off delayed start, the thinnest acceptable scheduler shape is one that converts schedule configuration into the same launch contract used by ad hoc runs and lets Temporal own the actual timer.
+
 ## Why Not Child Workflows In v1
 
 This does not mean child workflows are bad.

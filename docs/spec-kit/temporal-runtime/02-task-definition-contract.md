@@ -67,9 +67,10 @@ type LaunchRecord = {
   version: 1;
   runId: string;
   taskDefinitionId: string;
-  triggerType: "ad_hoc";
+  triggerType: "ad_hoc" | "scheduled_once" | "recurring";
+  scheduleId?: string;
   initiatedAt: string;
-  initiatedBy: "operator";
+  initiatedBy: "operator" | "schedule";
   materialization: {
     sourceKind: "existing_beads_issue" | "create_beads_issue";
     resolvedBeadsId: string;
@@ -82,6 +83,11 @@ type LaunchRecord = {
       priority?: 0 | 1 | 2 | 3 | 4;
       parentBeadsId?: string;
     };
+  };
+  runtimeStart?: {
+    mode: "immediate" | "delayed_once";
+    startDelayMs?: number;
+    scheduledFor?: string;
   };
   workflowInput: IssueWorkflowInput;
 };
@@ -194,6 +200,13 @@ Purpose:
 The launch record is a derived audit artifact for launch-time decisions.
 
 It is not workflow truth and it is not a substitute for Temporal execution history.
+
+Starting in Step 3, the same launch-record shape is also used for schedule-triggered runs. In those cases:
+
+- `triggerType` reflects the schedule-triggered entrypoint
+- `scheduleId` identifies the schedule definition that triggered the run
+- `initiatedBy` is `schedule`
+- `runtimeStart` may describe delayed-start intent such as `scheduledFor` and `startDelayMs`
 
 ## Invariants
 

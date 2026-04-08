@@ -116,10 +116,12 @@ Owns:
 - when to start a workflow
 - when to wake a workflow for time-based reasons
 - recurring cadence management
+- translating schedule definitions into the same normalized launch model used by ad hoc runs
 
 Does not own:
 
 - workflow phase logic
+- BEADS workflow truth
 
 ### Top-Level Issue Workflow
 
@@ -155,7 +157,7 @@ They do not invent their own workflow semantics.
 1. operator or schedule triggers a task definition
 2. the launch/materialization layer resolves or creates one concrete BEADS issue/epic
 3. the launch/materialization layer writes a launch record for the run
-4. scheduler or launcher starts a top-level workflow for that concrete BEADS target
+4. the scheduler or launcher starts a top-level workflow for that concrete BEADS target using Temporal-native runtime controls such as delayed start
 5. workflow reads BEADS and determines the next legal metaswarm step
 6. workflow executes activities
 7. workflow waits when blocked

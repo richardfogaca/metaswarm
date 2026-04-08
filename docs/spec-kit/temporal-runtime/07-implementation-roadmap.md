@@ -105,24 +105,43 @@ Build:
 
 - schedule definition loader and validator
 - one-off delayed scheduling
-- recurring scheduling
+- scheduled-launch normalization through the existing launch path
 
 Must prove:
 
 - one-off delayed tasks run once
-- recurring tasks run on durable cadence
+- scheduled launches converge on the same workflow input and launch-record model as ad hoc launches
 - schedule state stays outside workflow truth
+
+Step 3 restricted profile:
+
+- repo-local JSON schedule definitions
+- `trigger.kind: "once"` only
+- `overlapPolicy: "skip"` only
+- `catchupPolicy: "none"` only
+- schedule-triggered launches reference task definitions with `mode: "scheduled_once"`
+- first implementation schedules task definitions that resolve to an existing BEADS issue
+- Temporal-native delayed start keeps timer state in Temporal rather than repo-local schedule ledgers
+
+Explicitly defer to later Step 3 expansion:
+
+- recurring cadence execution
+- overlap policies beyond `skip`
+- catchup windows
+- timezone-aware recurring interpretation
+- schedule-triggered create-new materialization
+- richer pause/cancel/backfill lifecycle
 
 Validation strategy:
 
 - schema validation tests for schedule definitions
-- deterministic fake-time tests for delayed and recurring schedule triggering
-- overlap and catchup policy tests
+- deterministic fake-time tests for delayed once scheduling
+- rejection tests for unsupported recurring, overlap, and catchup combinations in the restricted profile
 - scenario tests proving scheduled launches and ad hoc launches converge on the same top-level workflow behavior
 
 Phase exit gate:
 
-- do not proceed until delayed and recurring schedules are deterministic, replay-safe, and clearly separate from BEADS workflow truth
+- do not proceed until delayed once schedules are deterministic, replay-safe, and clearly separate from BEADS workflow truth, with a documented path for later recurring expansion
 
 ### Step 4: Top-Level Workflow Behavior
 

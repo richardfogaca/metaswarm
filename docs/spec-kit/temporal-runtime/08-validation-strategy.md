@@ -194,6 +194,17 @@ Step 2 should not proceed without these concrete tests:
 5. launch-record tests prove every ad hoc run writes an explicit record containing the resolved BEADS id and the normalized workflow input
 6. scenario test proves an ad hoc launch can feed the Step 1 workflow and complete using the same runtime contract regardless of whether the BEADS target already existed or was created during launch
 
+## Step 3 Practical Test Matrix
+
+Step 3 should not proceed without these concrete tests:
+
+1. schedule-definition contract accepts valid one-off delayed schedules and rejects malformed timestamps, unsupported overlap settings, and unsupported catchup settings in the restricted profile
+2. schedule-definition loader rejects file/id mismatches and malformed JSON
+3. scheduled-launch preparation rejects paused schedules, unsupported recurring schedules, past-or-immediate `startAt` values, task-definition mode mismatches, and create-new materialization in the restricted profile
+4. deterministic schedule tests prove a delayed once launch starts the same top-level workflow after the requested delay and only once
+5. scenario tests prove a schedule-triggered launch and an ad hoc launch converge on the same workflow input and launch-record shape apart from trigger-specific fields
+6. launch-record tests prove schedule-triggered runs record `scheduleId`, `triggerType`, and delayed-start metadata without introducing repo-local schedule truth
+
 ## Acceptance Standard
 
 The implementation is on track only if the operator can eventually trust this experience:
