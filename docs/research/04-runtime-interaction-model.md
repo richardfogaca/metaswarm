@@ -15,6 +15,31 @@ The desired runtime pattern is:
 7. if blocked on a human or an external condition, it waits
 8. on wakeup, it re-reads authoritative state before continuing
 
+This loop assumes a higher-level structure around it:
+
+- a task definition tells the system what should run
+- a scheduler decides when to start or wake a run
+- a top-level issue workflow executes the loop
+- a review surface explains the outcome afterward
+
+## Task Entry Model
+
+The runtime should support three ways to enter the loop:
+
+### 1. Ad Hoc Task
+
+- operator starts a task now
+
+### 2. One-Off Scheduled Task
+
+- operator defines a task that should start later once
+
+### 3. Recurring Scheduled Task
+
+- operator defines a task template or recurring work item that should run on a cadence
+
+In all three cases, the runtime behavior after start should converge on the same top-level workflow model.
+
 ## Recommended v1 Shape
 
 ### One workflow per issue
@@ -24,6 +49,12 @@ The first slice should use:
 - one Temporal workflow per issue or epic
 
 This is simpler to reason about and easier to test.
+
+This should remain the default model even when the system later supports subtasks and recurring schedules.
+
+The scheduler starts a top-level workflow.
+
+The top-level workflow remains the owner of the issue lifecycle.
 
 ### Activities for side effects
 
@@ -57,6 +88,10 @@ Schedules should be used for:
 - periodic PR shepherd wakeups
 - recurring maintenance runs
 
+Schedules should start or wake workflows.
+
+They should not themselves encode metaswarm workflow logic.
+
 ## Why Not Child Workflows In v1
 
 This does not mean child workflows are bad.
@@ -85,6 +120,12 @@ Recommended first design:
 - one durable issue workflow
 - activities for the actual steps
 
+Default rule for subtasks:
+
+- represent them in BEADS
+- coordinate them from the parent workflow
+- keep them inside the same runtime workflow unless a real isolation need appears
+
 Possible later uses for child workflows:
 
 - a very large work unit with its own long lifecycle
@@ -105,6 +146,29 @@ Possible later uses for child workflows:
 10. the workflow re-reads authoritative state
 11. it proceeds only if the durable approval is present
 12. in the morning, the operator reviews a clear summary of what happened
+
+## Morning Review Artifact Contract
+
+To keep next-day review simple, the system should eventually produce one concise per-run review artifact or report.
+
+Minimum contents:
+
+- task id
+- run id
+- trigger type:
+  - ad hoc
+  - one-off scheduled
+  - recurring scheduled
+- start and end timestamps
+- steps attempted
+- accepted changes summary
+- validation summary
+- blocked or failed points
+- human action required now
+
+This should be a read model only.
+
+It should not become workflow authority.
 
 ## Morning Review Surface
 

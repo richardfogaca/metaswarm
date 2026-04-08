@@ -28,7 +28,54 @@ Temporal is being introduced so that the existing workflow engine can become:
 - safer for unattended overnight runs
 - suitable for delayed and recurring execution
 
+The target architecture should therefore be read as a stack:
+
+1. task definition layer
+2. scheduler layer
+3. top-level issue workflow layer
+4. subtask/work-unit execution layer
+5. morning review/read-model layer
+
 ## Components
+
+### Task Definition Layer
+
+Role:
+
+- define what should run
+- define when it should run
+- distinguish between ad hoc, one-off scheduled, and recurring work
+
+This layer should support at least three entry modes:
+
+- ad hoc task started now
+- one-off task scheduled for a later time
+- recurring task scheduled on a cadence
+
+This layer should not define workflow semantics.
+
+It defines launch intent and schedule intent.
+
+### Scheduler Layer
+
+Role:
+
+- start top-level workflows at the right time
+- wake paused workflows when time-based conditions are met
+- manage recurring cadence execution
+
+The scheduler should decide:
+
+- when to start
+- when to wake
+- which task definition triggered the run
+
+The scheduler should not decide:
+
+- what the workflow does internally
+- which gates are skipped or enforced
+
+That remains metaswarm policy.
 
 ### metaswarm Workflow Policy Layer
 
@@ -115,6 +162,40 @@ In the integrated design:
 - metaswarm orchestrator logic still decides the process
 - Temporal hosts that logic inside a durable runtime execution shell
 
+This should be the primary runtime unit:
+
+- one top-level workflow per issue or epic
+
+That top-level workflow is responsible for:
+
+- reading BEADS state
+- deciding the next eligible metaswarm step
+- creating or coordinating subtasks/work units
+- waiting safely at human or external boundaries
+- producing the operator-facing run summary
+
+### Subtask / Work-Unit Execution Layer
+
+Default rule:
+
+- subtasks and work units remain inside the parent issue workflow
+
+That means:
+
+- decomposition truth still lives in BEADS
+- the parent workflow coordinates work-unit progression
+- most work-unit steps are activities, not separate workflows
+
+Later exception rule:
+
+- a subtask or work unit should only become its own workflow if it has a genuinely independent lifecycle that benefits from runtime isolation
+
+Examples:
+
+- very long-running independent work
+- a recursive sub-epic
+- a release lane with its own timing and wakeups
+
 ### Swarm Coordinator
 
 Role:
@@ -176,6 +257,30 @@ Role:
 
 This is support memory, not runtime control.
 
+### Morning Review / Read Model Layer
+
+Role:
+
+- present overnight outcomes in a way the operator can review quickly
+
+This layer should answer:
+
+- what ran
+- what changed
+- what validations ran
+- what passed
+- what failed
+- what is blocked
+- what needs a human now
+
+This should be derived from:
+
+- Temporal run history
+- BEADS task state
+- repo diff and validation outputs
+
+It should remain a read model, not workflow authority.
+
 ## Recommended First-Cut Topology
 
 The simplest initial topology is:
@@ -218,3 +323,17 @@ Examples of recurring work that fit this model:
 The key point is that the scheduling surface should start workflows and wake workflows.
 
 It should not redefine metaswarm's internal workflow semantics.
+
+## End-State Shape
+
+The intended end-state architecture should look like this:
+
+1. a task definition exists
+2. the scheduler starts or wakes a top-level issue workflow
+3. the top-level workflow reads BEADS and applies metaswarm policy
+4. the workflow coordinates subtasks and work units
+5. activities execute side effects and agent work
+6. the workflow waits safely when blocked
+7. the morning review surface summarizes the run for the operator
+
+This means the main scaling unit is the top-level workflow, not every subtask by default.

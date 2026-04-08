@@ -29,6 +29,14 @@ When that workflow is well tested and clearly correct:
 
 The system should not drift into a mess while chasing autonomy.
 
+Architecturally, the roadmap is trying to arrive at this end-state:
+
+- task definition layer
+- scheduler layer
+- top-level issue workflow per task
+- subtask/work-unit coordination inside the parent workflow by default
+- morning review surface for the operator
+
 ## Phase 1: Single-Workflow Runtime Skeleton
 
 Goal:
@@ -49,6 +57,7 @@ Success criteria:
 - idempotency rules are in place
 - a basic operator summary exists
 - the runtime can support at least one delayed-start use case cleanly
+- the top-level workflow boundary is clear and stable
 
 ## Phase 2: Late-Stage Durability
 
@@ -94,6 +103,7 @@ Success criteria:
 - a recurring workflow can be scheduled on a durable cadence
 - schedule metadata stays clearly separate from workflow truth
 - scheduled starts and resumed runs still produce a clear morning summary
+- the scheduler layer remains thin and does not absorb metaswarm workflow semantics
 
 ## Phase 4: Spec-To-Plan Lane
 
@@ -141,6 +151,7 @@ Success criteria:
 - retries do not duplicate harmful side effects
 - workflow truth stays coherent
 - overnight implementation results are reviewable in the morning
+- subtasks and work units still default to parent-workflow coordination unless a clear isolation reason exists
 
 ## Phase 6: Expansion Only After Proof
 
@@ -163,5 +174,6 @@ The integration is accomplishing its purpose when this is normal:
 4. the operator wakes up and can quickly review a trustworthy summary
 5. the operator understands what to approve, revise, or continue next
 6. both one-off scheduled tasks and recurring scheduled tasks feel like first-class operator features rather than hacks
+7. the architecture still feels like one coherent system instead of two overlapping orchestrators
 
 That is the product outcome the roadmap should optimize for.

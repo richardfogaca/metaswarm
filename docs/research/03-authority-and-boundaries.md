@@ -24,6 +24,7 @@ So the integration must define authority very explicitly.
 - workflow-visible task status
 - durable coordination context
 - knowledge priming context
+- decomposition truth for tasks and subtasks
 
 If a human asks, "what is the task state?" the answer should be recoverable from BEADS.
 
@@ -35,6 +36,7 @@ If a human asks, "what is the task state?" the answer should be recoverable from
 - retry policy
 - wakeup scheduling
 - operational execution history
+- schedule execution state
 
 If a human asks, "what is the runtime doing right now?" the answer belongs to Temporal.
 
@@ -45,6 +47,7 @@ If a human asks, "what is the runtime doing right now?" the answer belongs to Te
 - what counts as approval
 - what counts as failure
 - when escalation is required
+- how top-level tasks decompose into subtasks and work units
 
 ### Agent Hosts Own
 
@@ -69,9 +72,22 @@ Those observations can influence workflow progression, but do not define metaswa
 
 Temporal may mirror workflow state, but it must not be the only durable home for it.
 
+This includes:
+
+- top-level task state
+- subtask/work-unit decomposition state
+- workflow-visible blocked/ready/completed state
+
 ### Contract 2: Temporal Owns Runtime Truth
 
 BEADS should not be repurposed into a homemade scheduler or sleep ledger.
+
+This includes:
+
+- whether a scheduled run has started
+- whether it is asleep waiting on time
+- whether it is retrying
+- which runtime execution produced a given overnight summary
 
 ### Contract 3: Human Approval Must Be Durable Before Resume
 
@@ -99,6 +115,8 @@ Recommended identity model:
 - BEADS id is the business id
 - Temporal workflow id references the BEADS id
 - branches, worktrees, and reports also carry the BEADS id
+
+For recurring scheduled runs, the recurring definition should have its own stable schedule id, and each resulting runtime execution should still map back to the BEADS business id created or targeted by that run.
 
 ### Contract 7: Reconciliation Before Action
 

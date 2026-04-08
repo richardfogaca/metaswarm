@@ -87,6 +87,17 @@ The intended division of labor is:
 - BEADS records the task graph and workflow-facing truth
 - Temporal makes that process schedulable, durable, and unattended-safe
 
+The target end-state architecture should also include:
+
+- a task definition layer for:
+  - ad hoc tasks
+  - one-off scheduled tasks
+  - recurring scheduled tasks
+- a scheduler layer that starts or wakes workflows based on time
+- a top-level issue workflow per task/epic
+- a clear rule that subtasks stay inside the parent workflow by default
+- a simple morning review surface for overnight outcomes
+
 The first implementation slice should be narrow:
 
 - one workflow per issue
