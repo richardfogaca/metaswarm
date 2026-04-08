@@ -36,7 +36,7 @@ Per-project config at `.metaswarm/external-tools.yaml` (optional -- if absent, e
 adapters:
   codex:
     enabled: true
-    model: "gpt-5.3-codex"
+    model: "gpt-5.4"
     timeout_seconds: 300
     sandbox: docker          # docker | platform | none
   gemini:

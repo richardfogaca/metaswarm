@@ -5,7 +5,7 @@
 adapters:
   codex:
     enabled: true
-    model: "gpt-5.3-codex"          # Model to use for Codex CLI invocations
+    model: "gpt-5.4"                # Model to use for Codex CLI invocations
     timeout_seconds: 300             # Max seconds per invocation before kill
     sandbox: none                    # docker | platform | none
     auth_env_var: "OPENAI_API_KEY"   # Environment variable holding the API key

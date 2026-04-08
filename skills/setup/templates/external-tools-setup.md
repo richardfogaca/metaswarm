@@ -167,7 +167,7 @@ Edit `.metaswarm/external-tools.yaml` to customize:
 adapters:
   codex:
     enabled: true                # Set to false to disable Codex
-    model: "gpt-5.3-codex"      # Model for Codex CLI invocations
+    model: "gpt-5.4"            # Model for Codex CLI invocations
     timeout_seconds: 300         # Max seconds per invocation (5 min default)
     sandbox: none                # docker | platform | none
     auth_env_var: "OPENAI_API_KEY"
@@ -193,6 +193,13 @@ budget:
   per_session_usd: 20.00         # Max total spend per session
 ```
 
+For ChatGPT OAuth-backed Codex CLI usage, set `adapters.codex.model` to a model
+your Codex login can actually use. On this machine, `codex login status`
+reported `Logged in using ChatGPT`, and `codex exec -m gpt-5.4` succeeded, so
+`gpt-5.4` is the correct model string for this repo. If your local
+`~/.codex/config.toml` uses a different model, keep the project config aligned
+with that value.
+
 **Important**: If `.metaswarm/external-tools.yaml` is absent, metaswarm works
 normally without any external tool invocations. The config file is entirely
 optional -- you only need it if you want to customize defaults.
@@ -217,7 +224,7 @@ skills/external-tools/adapters/gemini.sh health | jq .
   "status": "ready",
   "version": "0.101.0",
   "auth_valid": true,
-  "model": "gpt-5.3-codex"
+  "model": "gpt-5.4"
 }
 ```
 

@@ -23,7 +23,29 @@ source "$(cd "$(dirname "$0")" && pwd)/_common.sh"
 # ---------------------------------------------------------------------------
 TOOL_NAME="codex"
 TOOL_CMD="codex"
-DEFAULT_MODEL="gpt-5.3-codex"
+DEFAULT_MODEL_FALLBACK="gpt-5.4"
+
+resolve_default_model() {
+  if [[ -n "${CODEX_MODEL:-}" ]]; then
+    printf '%s' "${CODEX_MODEL}"
+    return 0
+  fi
+
+  local codex_home="${CODEX_HOME:-${HOME}/.codex}"
+  local config_file="${codex_home}/config.toml"
+  if [[ -f "${config_file}" ]]; then
+    local configured_model
+    configured_model="$(sed -nE 's/^[[:space:]]*model[[:space:]]*=[[:space:]]*"([^"]+)".*$/\1/p' "${config_file}" | head -1)"
+    if [[ -n "${configured_model}" ]]; then
+      printf '%s' "${configured_model}"
+      return 0
+    fi
+  fi
+
+  printf '%s' "${DEFAULT_MODEL_FALLBACK}"
+}
+
+DEFAULT_MODEL="$(resolve_default_model)"
 
 # ===========================================================================
 # health — Preflight check
@@ -117,7 +139,7 @@ cmd_implement() {
       PATH="$PATH" \
       OPENAI_API_KEY="${OPENAI_API_KEY:-}" \
       CODEX_API_KEY="${CODEX_API_KEY:-}" \
-    "$TOOL_CMD" exec --full-auto --json -C "$XT_WORKTREE" "$prompt_content" \
+    "$TOOL_CMD" exec --full-auto --json --model "$DEFAULT_MODEL" -C "$XT_WORKTREE" "$prompt_content" \
     || exit_code=$?
 
   # Calculate duration
@@ -314,7 +336,7 @@ PROMPT_FOOTER
       PATH="$PATH" \
       OPENAI_API_KEY="${OPENAI_API_KEY:-}" \
       CODEX_API_KEY="${CODEX_API_KEY:-}" \
-    "$TOOL_CMD" exec --sandbox read-only --json -C "$XT_WORKTREE" "$review_prompt" \
+    "$TOOL_CMD" exec --sandbox read-only --json --model "$DEFAULT_MODEL" -C "$XT_WORKTREE" "$review_prompt" \
     || exit_code=$?
 
   # Calculate duration

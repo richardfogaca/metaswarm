@@ -92,7 +92,7 @@ else
 fi
 
 # emit_error: produces valid JSON
-ERROR_JSON="$(bash -c "source '$COMMON_SH' && emit_error codex implement gpt-5.3-codex 1 1 '' 0 ''")"
+ERROR_JSON="$(bash -c "source '$COMMON_SH' && emit_error codex implement gpt-5.4 1 1 '' 0 ''")"
 if printf '%s' "$ERROR_JSON" | jq . >/dev/null 2>&1; then
   pass "emit_error produces valid JSON"
 else

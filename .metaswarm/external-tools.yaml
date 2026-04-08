@@ -1,0 +1,21 @@
+adapters:
+  codex:
+    enabled: true
+    model: "gpt-5.4"
+    timeout_seconds: 300
+    sandbox: none
+    auth_env_var: "OPENAI_API_KEY"
+  gemini:
+    enabled: false
+    model: "pro"
+    timeout_seconds: 300
+    sandbox: none
+    auth_env_var: "GEMINI_API_KEY"
+
+routing:
+  default_implementer: "codex"
+  escalation_order: ["codex", "claude"]
+
+budget:
+  per_task_usd: 2.00
+  per_session_usd: 20.00
